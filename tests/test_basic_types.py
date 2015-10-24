@@ -19,6 +19,10 @@ class TestSpareType(unittest.TestCase):
         spare_desc = ET.fromstring('<field type="spare" bits="0">woot</field>')
         self.assertRaises(ValueError, lambda : structureparser.parse_field(spare_desc))
 
+    def test_spare_wrongsize(self):
+        spare_desc = ET.fromstring('<field type="spare" bits="a">woot</field>')
+        self.assertRaises(ValueError, lambda : structureparser.parse_field(spare_desc))
+
 class TestFloat(unittest.TestCase):
     
     def test_float32(self):
@@ -108,4 +112,18 @@ class TestString(unittest.TestCase):
         char_desc = ET.fromstring('<field type="string" lenght="5">a_field</field>')
         parsed_field = structureparser.parse_field(char_desc)
         self.assertEqual(parsed_field["type"], "string")
+        self.assertEqual(parsed_field["bits"], 40)
+
+class TestRaw(unittest.TestCase):
+
+    def test_raw(self):
+        char_desc = ET.fromstring('<field type="raw(*)">a_field</field>')
+        parsed_field = structureparser.parse_field(char_desc)
+        self.assertEqual(parsed_field["type"], "raw(*)")
+        self.assertEqual(parsed_field["bits"], 8)
+
+    def test_raw_withsize(self):
+        char_desc = ET.fromstring('<field type="raw" lenght="5">a_field</field>')
+        parsed_field = structureparser.parse_field(char_desc)
+        self.assertEqual(parsed_field["type"], "raw")
         self.assertEqual(parsed_field["bits"], 40)

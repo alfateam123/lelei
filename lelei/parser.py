@@ -35,7 +35,13 @@ def parse_field(field_doc):
         try:
             field_ast["bits"] = bitsForStructure(field_doc.attrib["type"], 8*int(field_doc.attrib["lenght"]))
         except KeyError:
-            field_ast["bits"] = bitsForStructure(field_doc.attrib["type"], 0)
+            try:
+                field_ast["bits"] = bitsForStructure(field_doc.attrib["type"], 0)
+            except ValueError as ve:
+                if field_ast["type"] == "raw(*)":
+                    field_ast["bits"] = 8
+                else:
+                    raise ve
     return field_ast
 
 def build_ast(doc):

@@ -38,9 +38,9 @@ This is a list of the thing that will be implemented
   - [x]  int2 ->  int32,  int40,  int48, int64
   - [x] uint1 -> uint32, uint40, uint48
   - [x] float32, float64
-  - [ ] string, string(size)
-  - [ ] string_nl, string_nl(size)
-  - [ ] raw(size)
+  - [x] string, string(size)
+  - [x] string_nl, string_nl(size)
+  - [x] raw(size)
   - [x] padding_bits [type = `padding`]
 
 - [ ] No Statement value
