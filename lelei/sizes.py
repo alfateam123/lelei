@@ -45,6 +45,13 @@ def intChecker(bits):
         return read_bits
     return inner_func
 
+def boolChecker(bits):
+    @defaultsize(bits)
+    @rangesize(bits, bits)
+    def inner_func(read_bits):
+        return read_bits
+    return inner_func
+
 SIZE_CHECKERS = {
 "padding": paddingChecker,
 "spare"  : spareChecker,
@@ -62,3 +69,6 @@ SIZE_CHECKERS["int48"] = intChecker(48)
 SIZE_CHECKERS["uint40"] = intChecker(40)
 SIZE_CHECKERS["uint48"] = intChecker(48)
 SIZE_CHECKERS["uint64"] = intChecker(64)
+
+for i in [1, 8, 16, 32]:
+    SIZE_CHECKERS["bool%i"%i] = boolChecker(i)
