@@ -1,78 +1,47 @@
-import xml.sax
+import xml.etree.ElementTree as ET
 import re
-from transitions import Machine
 
-class StructureParser(xml.sax.ContentHandler):
+def _getroot(str_):
+    return ET.fromstring(str_)	
 
-    _parsing_states = ['reading', 'inside_fieldlists', 'inside_field', 'inside_name']
-
-    def __init__(self):
-        xml.sax.ContentHandler.__init__(self)
-        self._ast = dict()
-        self._tempStruct = {"type":None, "bits":-1, "name":None}
-        self._prepare_fsm()
-
-    def _prepare_fsm(self):
-        self.machine = Machine(model=self,
-                               states=StructureParser._parsing_states,
-                               initial='reading')
-        self.machine.add_transition("found_fieldlists", "reading", "inside_fieldlists")
-        self.machine.add_transition("found_field", "inside_fieldlists", "inside_field")
-        self.machine.add_transition("found_name",  "reading", "inside_name")
-        self.machine.add_transition("exitfrom_name", "inside_name", "reading")
-        self.machine.add_transition("exitfrom_field", "inside_field", "inside_fieldlists")
-        self.machine.add_transition("exitfrom_fieldlists", "inside_fieldlists", "reading")
-
-    @property
-    def ast(self):
-        return self._ast.copy()
+def bitsForStructure(struct_type, read_bits):
+    #works for int/uint32, etc.
+    bits_by_structType = int(re.findall("(\d+)$", struct_type)[-1])
+    assert bits_by_structType%8 == 0 and 0 < bits_by_structType <= 64, "{} is not a valid dimension for a type".format(bits_by_structType)
+    if read_bits > bits_by_structType:
+        raise ValueError("you are asking for more bits than the type can contain! %s -> %d"%(struct_type, read_bits))
     
-    def characters(self, content):
-        #if self._reading_status == INSIDE_NAME:
-        if self.state == "inside_name":
-            self._ast["name"] = content
-        #elif self._reading_status == INSIDE_FIELD:
-        elif self.state == "inside_field":
-            self._tempStruct["name"] = content
+    if read_bits == 0:
+        return bits_by_structType
+    else:
+        return read_bits
 
-    def startElement(self, name, attrs):
-        assert(self.machine)
-        if name == "name":
-            self.found_name()
-            #self._reading_status = INSIDE_NAME 
-        elif name == "fields": #and self._reading_status == READING:
-            #self._reading_status = INSIDE_FIELDSLIST
-            self.found_fieldlists()
-        elif name == "field": #and self._reading_status == INSIDE_FIELDSLIST:
-            #self._reading_status = INSIDE_FIELD
-            self.found_field()
-            self._tempStruct["type"] = attrs.getValue("type")
-            self._tempStruct["bits"] = self.bitsForStructure(attrs.getValue("type"), int(attrs.getValue("bits")))
+def structure_name(doc):
+    names = doc.findall("name")
+    assert len(names) == 1
+    return names[0].text
 
-    def endElement(self, name):
-        if self.state == "inside_name":
-            self.exitfrom_name()
-        
-        elif self.state == "inside_field":
-            self.exitfrom_field()
-            try:
-                self._ast["fields"].append(self._tempStruct.copy())
-            except KeyError:
-                self._ast["fields"] = [self._tempStruct.copy()]
-            self._tempStruct = {"type":None, "bits":-1, "name":None}
-        
-        elif self.state == "inside_fieldlists":
-            self.exitfrom_fieldlists()
+def parse_fields(doc):
+    doc_fields = doc.findall("fields/field")
+    assert len(doc_fields) > 0
+    fields = [parse_field(f_) for f_ in doc_fields]
+    return fields
 
-    def bitsForStructure(self, struct_type, read_bits):
-        #works for int/uint32, etc.
-        #we hope you don't want to send floats without converting them to uint32 :D
-        bits_by_structType = int(re.findall("(\d+)$", struct_type)[-1])
-        assert bits_by_structType%8 == 0 and 0 < bits_by_structType <= 64, "{} is not a valid dimension for a type".format(bits_by_structType)
-        if read_bits > bits_by_structType:
-            raise ValueError("you are asking for more bits than the type can contain! %s -> %d"%(struct_type, read_bits))
-        
-        if read_bits == 0:
-            return bits_by_structType
-        else:
-            return read_bits
+def parse_field(field_doc):
+    field_ast = dict()
+    field_ast["name"] = field_doc.text
+    field_ast["type"] = field_doc.attrib["type"]
+    field_ast["bits"] = bitsForStructure(field_doc.attrib["type"], int(field_doc.attrib["bits"]))
+    return field_ast
+
+def build_ast(doc):
+    ast = dict()
+    ast["name"] = structure_name(doc)
+    ast["fields"] = parse_fields(doc)
+    return ast
+
+def parse(str_):
+    root = _getroot(str_)
+    ast = build_ast(root)
+
+    return ast
