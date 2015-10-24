@@ -68,7 +68,7 @@ setup(
     # requirements files see:
     # https://packaging.python.org/en/latest/requirements.html
     install_requires=[
-                        'transitions' #for finite state machine support
+                        #'lxml' #for xml support
     ],
 
     #dependency_links=[
