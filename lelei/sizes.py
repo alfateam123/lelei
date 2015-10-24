@@ -24,6 +24,15 @@ def negativenotallowed(func):
         return func(read_bits)
     return inner_func
 
+def nonzero(func):
+    def inner_func(read_bits):
+        if read_bits == 0:
+            raise ValueError("this type requires a size higher than zero")
+        return func(read_bits)
+    return inner_func
+
+
+
 @negativenotallowed
 @maxsize(8)
 @defaultsize(8)
@@ -49,9 +58,15 @@ def int32Checker(read_bits):
 def int64Checker(read_bits):
     return read_bits
 
+@nonzero
+@negativenotallowed
+def spareChecker(read_bits):
+	return read_bits
+
 SIZE_CHECKERS = {
 "uint8" : int8Checker,
 "uint16": int16Checker,
 "uint32": int32Checker,
-"uint64": int64Checker
+"uint64": int64Checker,
+"spare" : spareChecker
 }
