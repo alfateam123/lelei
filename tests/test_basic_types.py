@@ -75,3 +75,5 @@ class TestBool(unittest.TestCase):
     def test_bool_doesnotexist(self):
         bool_desc = ET.fromstring('<field type="bool25">a_field</field>')
         self.assertRaises(ValueError, lambda : structureparser.parse_field(bool_desc))
+
+

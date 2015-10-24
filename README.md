@@ -23,3 +23,42 @@ I don't know if Wireshark offers the same functionality, or other programs that 
 the same thing.
 If you're interested in alternatives, you may use [Csjark](https://csjark.readthedocs.org/en/latest/),
 which translates C structures to Lua-based dissectors.
+
+### Important things: state of work ###
+
+Does it write things yet? **No**.
+
+How much of the grammar has been implemented?  
+This is a list of the thing that will be implemented
+
+- Basic Types
+  - [x] spare
+  - [ ] char, schar, uchar
+  - [x] bool1, bool8, bool16, bool32
+  - [x]  int2 ->  int32,  int40,  int48, int64
+  - [x] uint1 -> uint32, uint40, uint48
+  - [x] float32, float64
+  - [ ] string, string(size)
+  - [ ] string_nl, string_nl(size)
+  - [ ] raw(size)
+  - [x] padding_bits [type = `padding`]
+
+- [ ] No Statement value
+- [ ] Transform spec
+- [ ] Display spec
+- [ ] Constraint spec
+- [ ] Local byte order spec
+- [ ] Enum
+- [ ] Bit Fields
+
+This is a list of things that will be implemented,
+but not in the nearest future.
+
+- [ ] Arrays
+- [ ] Struct
+- [ ] Switch
+- [ ] Switch with expression
+
+The rest of the specification may be not implemented, as it may
+be difficult to express set/var commands and functions while staying
+inside the XML structure, and Lelei is not a tool for that.
