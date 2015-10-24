@@ -76,4 +76,22 @@ class TestBool(unittest.TestCase):
         bool_desc = ET.fromstring('<field type="bool25">a_field</field>')
         self.assertRaises(ValueError, lambda : structureparser.parse_field(bool_desc))
 
+class TestXChar(unittest.TestCase):
 
+    def test_char(self):
+        char_desc = ET.fromstring('<field type="char">a_field</field>')
+        parsed_field = structureparser.parse_field(char_desc)
+        self.assertEqual(parsed_field["type"], "char")
+        self.assertEqual(parsed_field["bits"], 1)
+
+    def test_schar(self):
+        char_desc = ET.fromstring('<field type="schar">a_field</field>')
+        parsed_field = structureparser.parse_field(char_desc)
+        self.assertEqual(parsed_field["type"], "schar")
+        self.assertEqual(parsed_field["bits"], 1)
+
+    def test_uchar(self):
+        char_desc = ET.fromstring('<field type="uchar">a_field</field>')
+        parsed_field = structureparser.parse_field(char_desc)
+        self.assertEqual(parsed_field["type"], "uchar")
+        self.assertEqual(parsed_field["bits"], 1)

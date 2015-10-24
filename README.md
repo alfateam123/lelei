@@ -33,7 +33,7 @@ This is a list of the thing that will be implemented
 
 - Basic Types
   - [x] spare
-  - [ ] char, schar, uchar
+  - [x] char, schar, uchar
   - [x] bool1, bool8, bool16, bool32
   - [x]  int2 ->  int32,  int40,  int48, int64
   - [x] uint1 -> uint32, uint40, uint48
