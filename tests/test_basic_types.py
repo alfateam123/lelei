@@ -82,16 +82,30 @@ class TestXChar(unittest.TestCase):
         char_desc = ET.fromstring('<field type="char">a_field</field>')
         parsed_field = structureparser.parse_field(char_desc)
         self.assertEqual(parsed_field["type"], "char")
-        self.assertEqual(parsed_field["bits"], 1)
+        self.assertEqual(parsed_field["bits"], 8)
 
     def test_schar(self):
         char_desc = ET.fromstring('<field type="schar">a_field</field>')
         parsed_field = structureparser.parse_field(char_desc)
         self.assertEqual(parsed_field["type"], "schar")
-        self.assertEqual(parsed_field["bits"], 1)
+        self.assertEqual(parsed_field["bits"], 8)
 
     def test_uchar(self):
         char_desc = ET.fromstring('<field type="uchar">a_field</field>')
         parsed_field = structureparser.parse_field(char_desc)
         self.assertEqual(parsed_field["type"], "uchar")
-        self.assertEqual(parsed_field["bits"], 1)
+        self.assertEqual(parsed_field["bits"], 8)
+
+class TestString(unittest.TestCase):
+
+    def test_string(self):
+        char_desc = ET.fromstring('<field type="string">a_field</field>')
+        parsed_field = structureparser.parse_field(char_desc)
+        self.assertEqual(parsed_field["type"], "string")
+        self.assertEqual(parsed_field["bits"], 8)
+
+    def test_string_withsize(self):
+        char_desc = ET.fromstring('<field type="string" lenght="5">a_field</field>')
+        parsed_field = structureparser.parse_field(char_desc)
+        self.assertEqual(parsed_field["type"], "string")
+        self.assertEqual(parsed_field["bits"], 40)

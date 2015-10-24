@@ -55,6 +55,12 @@ def boolChecker(bits):
 def xcharChecker(bits):
     return 8
 
+
+@defaultsize(8)
+@rangesize(8, None)
+def stringChecker(read_bits):
+    return read_bits
+
 SIZE_CHECKERS = {
 "padding": paddingChecker,
 "spare"  : spareChecker,
@@ -62,7 +68,8 @@ SIZE_CHECKERS = {
 "float64": floatChecker(64),
 "uchar"  : xcharChecker,
 "schar"  : xcharChecker,
-"char"   : xcharChecker
+"char"   : xcharChecker,
+"string" : stringChecker
 }
 
 for i in range(1, 32+1):

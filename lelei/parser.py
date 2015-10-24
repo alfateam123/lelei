@@ -32,7 +32,10 @@ def parse_field(field_doc):
         #obviously, the KeyError is related to `bits` and not to `type`.
         field_ast["bits"] = bitsForStructure(field_doc.attrib["type"], int(field_doc.attrib["bits"]))
     except KeyError:
-        field_ast["bits"] = bitsForStructure(field_doc.attrib["type"], 0)
+        try:
+            field_ast["bits"] = bitsForStructure(field_doc.attrib["type"], 8*int(field_doc.attrib["lenght"]))
+        except KeyError:
+            field_ast["bits"] = bitsForStructure(field_doc.attrib["type"], 0)
     return field_ast
 
 def build_ast(doc):
