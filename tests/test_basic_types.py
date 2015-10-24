@@ -34,3 +34,4 @@ class TestFloat(unittest.TestCase):
         self.assertEqual(parsed_field["name"], "woot")
         self.assertEqual(parsed_field["type"], "float64")
         self.assertEqual(parsed_field["bits"], 64)
+
