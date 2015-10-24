@@ -60,9 +60,9 @@ SIZE_CHECKERS = {
 }
 
 for i in range(1, 32+1):
-    SIZE_CHECKERS["uint{}".format(i)] = intChecker(i)
+    SIZE_CHECKERS["uint%d"%(i)] = intChecker(i)
     if i>=2:
-        SIZE_CHECKERS["int{}".format(i)] = intChecker(i)
+        SIZE_CHECKERS["int%d"%(i)] = intChecker(i)
 
 SIZE_CHECKERS["int40"] = intChecker(40)
 SIZE_CHECKERS["int48"] = intChecker(48)
