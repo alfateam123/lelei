@@ -1,9 +1,16 @@
 
-def maxsize(max_):
+#use None to not set an explicit value
+def rangesize(min_, max_):
     def inner_dec(func):
+        def passCheck(n):
+            if min_!=None and min_ > n: return False
+            if max_!=None and max_ < n: return False
+            return True
+
         def inner_func(read_bits):
-            if max_ < read_bits:
-                raise ValueError("you are asking for %d bits, but the type can contain only %d!"%(read_bits, max_))
+            if not passCheck(read_bits):
+                raise ValueError("you are asking for {} bits, but the type can only be inside [{}, {}] range!".format(
+                    read_bits, min_, max_))
             return func(read_bits)
         return inner_func
     return inner_dec
@@ -17,56 +24,49 @@ def defaultsize(default_):
         return inner_func
     return inner_dec
 
-def negativenotallowed(func):
-    def inner_func(read_bits):
-        if read_bits < 0:
-            raise ValueError("type sizes must be zero or higher than zero. no negative values allowed")
-        return func(read_bits)
-    return inner_func
 
-def nonzero(func):
-    def inner_func(read_bits):
-        if read_bits == 0:
-            raise ValueError("this type requires a size higher than zero")
-        return func(read_bits)
-    return inner_func
-
-
-
-@negativenotallowed
-@maxsize(8)
 @defaultsize(8)
+@rangesize(0, 8)
 def int8Checker(read_bits):
     return read_bits
 
-@negativenotallowed
-@maxsize(16)
 @defaultsize(16)
+@rangesize(0, 16)
 def int16Checker(read_bits):
     return read_bits
 
-@negativenotallowed
-@maxsize(32)
 @defaultsize(32)
+@rangesize(0, 32)
 def int32Checker(read_bits):
     return read_bits
 
 
-@negativenotallowed
-@maxsize(64)
 @defaultsize(64)
+@rangesize(0, 64)
 def int64Checker(read_bits):
     return read_bits
 
-@nonzero
-@negativenotallowed
+@rangesize(1, None)
 def spareChecker(read_bits):
 	return read_bits
 
+@defaultsize(32)
+@rangesize(32, 32)
+def float32Checker(read_bits):
+    return read_bits
+
+@defaultsize(64)
+@rangesize(64, 64)
+def float64Checker(read_bits):
+    return read_bits
+
+
 SIZE_CHECKERS = {
-"uint8" : int8Checker,
-"uint16": int16Checker,
-"uint32": int32Checker,
-"uint64": int64Checker,
-"spare" : spareChecker
+"uint8"  : int8Checker,
+"uint16" : int16Checker,
+"uint32" : int32Checker,
+"uint64" : int64Checker,
+"spare"  : spareChecker,
+"float32": float32Checker,
+"float64": float64Checker
 }
