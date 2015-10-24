@@ -24,49 +24,37 @@ def defaultsize(default_):
         return inner_func
     return inner_dec
 
-
-@defaultsize(8)
-@rangesize(0, 8)
-def int8Checker(read_bits):
-    return read_bits
-
-@defaultsize(16)
-@rangesize(0, 16)
-def int16Checker(read_bits):
-    return read_bits
-
-@defaultsize(32)
-@rangesize(0, 32)
-def int32Checker(read_bits):
-    return read_bits
-
-
-@defaultsize(64)
-@rangesize(0, 64)
-def int64Checker(read_bits):
-    return read_bits
-
 @rangesize(1, None)
 def spareChecker(read_bits):
-	return read_bits
-
-@defaultsize(32)
-@rangesize(32, 32)
-def float32Checker(read_bits):
     return read_bits
 
-@defaultsize(64)
-@rangesize(64, 64)
-def float64Checker(read_bits):
-    return read_bits
+def floatChecker(bits):
+    @defaultsize(bits)
+    @rangesize(bits, bits)
+    def inner_func(read_bits):
+        return read_bits
+    return inner_func
 
+def intChecker(bits):
+    @defaultsize(bits)
+    @rangesize(0, bits)
+    def inner_func(read_bits):
+        return read_bits
+    return inner_func
 
 SIZE_CHECKERS = {
-"uint8"  : int8Checker,
-"uint16" : int16Checker,
-"uint32" : int32Checker,
-"uint64" : int64Checker,
 "spare"  : spareChecker,
-"float32": float32Checker,
-"float64": float64Checker
+"float32": floatChecker(32),
+"float64": floatChecker(64)
 }
+
+for i in range(1, 32+1):
+    SIZE_CHECKERS["uint{}".format(i)] = intChecker(i)
+    if i>=2:
+        SIZE_CHECKERS["int{}".format(i)] = intChecker(i)
+
+SIZE_CHECKERS["int40"] = intChecker(40)
+SIZE_CHECKERS["int48"] = intChecker(48)
+SIZE_CHECKERS["uint40"] = intChecker(40)
+SIZE_CHECKERS["uint48"] = intChecker(48)
+SIZE_CHECKERS["uint64"] = intChecker(64)
