@@ -61,15 +61,26 @@ def xcharChecker(bits):
 def stringChecker(read_bits):
     return read_bits
 
+def rawAllChecker(read_bits):
+    if read_bits == "*": return 0
+    raise ValueError("read_bits is {0}, and it's not a correct value!".format(read_bits))
+
+@rangesize(8, None)
+def rawChecker(read_bits):
+    return read_bits
+
 SIZE_CHECKERS = {
-"padding": paddingChecker,
-"spare"  : spareChecker,
-"float32": floatChecker(32),
-"float64": floatChecker(64),
-"uchar"  : xcharChecker,
-"schar"  : xcharChecker,
-"char"   : xcharChecker,
-"string" : stringChecker
+"padding"   : paddingChecker,
+"spare"     : spareChecker,
+"float32"   : floatChecker(32),
+"float64"   : floatChecker(64),
+"uchar"     : xcharChecker,
+"schar"     : xcharChecker,
+"char"      : xcharChecker,
+"string"    : stringChecker,
+"string_nl" : stringChecker,
+"raw(*)"    : rawAllChecker,
+"raw"       : rawChecker
 }
 
 for i in range(1, 32+1):
