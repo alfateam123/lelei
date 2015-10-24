@@ -1,6 +1,9 @@
 Lelei: XML -> WireShark Generic Dissector
 =========================================
 
+### Disclaimer ###
+PLEASE NOTE THAT THIS PROJECT IS NOT FULLY FUNCTIONAL, SO USE IT AT YOUR OWN RISK. CONSIDER IT TO BE INCOMPLET AND INKORRECT. YOU HAVE BEEN WARNED.
+
 ### What is that? ###
 
 Lelei is a [cute sorceress](http://gate-thus-the-jsdf-fought-there.wikia.com/wiki/Lelei_La_Lalena)... no, wait, nevermind.
