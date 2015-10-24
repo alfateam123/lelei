@@ -35,3 +35,17 @@ class TestFloat(unittest.TestCase):
         self.assertEqual(parsed_field["type"], "float64")
         self.assertEqual(parsed_field["bits"], 64)
 
+class TestPaddingBits(unittest.TestCase):
+
+    def test_paddingBits(self):
+        padding_desc = ET.fromstring('<field type="padding">dis_not_pudding</field>')
+        parsed_field = structureparser.parse_field(spare_desc)
+        self.assertEqual(parsed_field["name"], "dis_not_pudding")
+        self.assertEqual(parsed_field["type"], "padding")
+        self.assertEqual(parsed_field["bits"], 0)
+
+    def test_paddingBits(self):
+        padding_desc = ET.fromstring('<field type="padding" bits="15">dis_not_pudding</field>')
+        parsed_field = structureparser.parse_field(padding_desc)
+        #`bits` is overridden
+        self.assertEqual(parsed_field["bits"], 0) 
