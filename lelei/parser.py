@@ -1,20 +1,25 @@
 import xml.etree.ElementTree as ET
 import re
+from sizes import SIZE_CHECKERS
 
 def _getroot(str_):
     return ET.fromstring(str_)	
 
 def bitsForStructure(struct_type, read_bits):
     #works for int/uint32, etc.
-    bits_by_structType = int(re.findall("(\d+)$", struct_type)[-1])
-    assert bits_by_structType%8 == 0 and 0 < bits_by_structType <= 64, "{} is not a valid dimension for a type".format(bits_by_structType)
-    if read_bits > bits_by_structType:
-        raise ValueError("you are asking for more bits than the type can contain! %s -> %d"%(struct_type, read_bits))
+    #bits_by_structType = int(re.findall("(\d+)$", struct_type)[-1])
+    #assert bits_by_structType%8 == 0 and 0 < bits_by_structType <= 64, "{} is not a valid dimension for a type".format(bits_by_structType)
+    #if read_bits > bits_by_structType:
+    #    raise ValueError("you are asking for more bits than the type can contain! %s -> %d"%(struct_type, read_bits))
     
-    if read_bits == 0:
-        return bits_by_structType
-    else:
-        return read_bits
+    #if read_bits == 0:
+    #    return bits_by_structType
+    #else:
+    #    return read_bits
+    try:
+        return SIZE_CHECKERS[struct_type](read_bits)
+    except KeyError:
+        raise ValueError("the given structure type {} does not exist".format(struct_type))
 
 def structure_name(doc):
     names = doc.findall("name")
