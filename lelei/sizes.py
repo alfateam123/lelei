@@ -28,6 +28,9 @@ def defaultsize(default_):
 def spareChecker(read_bits):
     return read_bits
 
+def paddingChecker(read_bits):
+    return 0
+
 def floatChecker(bits):
     @defaultsize(bits)
     @rangesize(bits, bits)
@@ -43,6 +46,7 @@ def intChecker(bits):
     return inner_func
 
 SIZE_CHECKERS = {
+"padding": paddingChecker,
 "spare"  : spareChecker,
 "float32": floatChecker(32),
 "float64": floatChecker(64)
