@@ -69,6 +69,7 @@ setup(
     # https://packaging.python.org/en/latest/requirements.html
     install_requires=[
                         #'lxml' #for xml support
+                        'pystache'
     ],
 
     #dependency_links=[

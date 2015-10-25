@@ -48,7 +48,7 @@ This is a list of the thing that will be implemented
   - [x] raw(size)
   - [x] padding_bits [type = `padding`]
 
-- [ ] Struct
+- [x] Struct
 - [ ] Enum
 - [ ] Transform spec
 - [ ] Arrays
