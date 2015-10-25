@@ -16,9 +16,9 @@ def main(args):
         fdesc_content = builder.build_fdesc(ast)
         fdesc_file.write(fdesc_content+"\n")
 
-    # with open(args.ws_name+".wsgd", "w") as wsgd_file:
-    #     wsgd_content = builder.build_wsgd(ast)
-    #     wsgd_file.write(wsgd_content+"\n")
+    with open(args.ws_name+".wsgd", "w") as wsgd_file:
+        wsgd_content = builder.build_wsgd(ast, args.ws_name)
+        wsgd_file.write(wsgd_content+"\n")
 
 if __name__ == '__main__':
     main(argparser.parse_args())
