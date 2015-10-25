@@ -1,10 +1,21 @@
+import pystache
+
+STRUCT_TEMPLATE = """
+struct {{struct_name}}
+{
+    {{#fields}}
+    {{.}}
+    {{/fields}}
+}
+""".strip()
+
 def build_field(field_ast):
-    modifiers = []
+    return pystache.render("{{type}} {{name}};", field_ast)
 
-    if field_ast.get("no_statement", None):
-        modifiers.append("ns="+field_ast["no_statement"])
-
-    return "{}{} {};".format(field_ast["type"], "{"+",".join(modifiers)+"}", field_ast["name"])
+def build_struct(ast):
+    fields = (build_field(f_) for f_ in ast["fields"])
+    return pystache.render(STRUCT_TEMPLATE, struct_name=ast["name"], fields=fields)
 
 def build(ast):
     raise NotImplementedError("Wireshark builder")
+
