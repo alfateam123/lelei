@@ -1,9 +1,16 @@
 
-def maxsize(max_):
+#use None to not set an explicit value
+def rangesize(min_, max_):
     def inner_dec(func):
+        def passCheck(n):
+            if min_!=None and min_ > n: return False
+            if max_!=None and max_ < n: return False
+            return True
+
         def inner_func(read_bits):
-            if max_ < read_bits:
-                raise ValueError("you are asking for %d bits, but the type can contain only %d!"%(read_bits, max_))
+            if not passCheck(read_bits):
+                raise ValueError("you are asking for {} bits, but the type can only be inside [{}, {}] range!".format(
+                    read_bits, min_, max_))
             return func(read_bits)
         return inner_func
     return inner_dec
@@ -17,56 +24,75 @@ def defaultsize(default_):
         return inner_func
     return inner_dec
 
-def negativenotallowed(func):
-    def inner_func(read_bits):
-        if read_bits < 0:
-            raise ValueError("type sizes must be zero or higher than zero. no negative values allowed")
-        return func(read_bits)
-    return inner_func
-
-def nonzero(func):
-    def inner_func(read_bits):
-        if read_bits == 0:
-            raise ValueError("this type requires a size higher than zero")
-        return func(read_bits)
-    return inner_func
-
-
-
-@negativenotallowed
-@maxsize(8)
-@defaultsize(8)
-def int8Checker(read_bits):
-    return read_bits
-
-@negativenotallowed
-@maxsize(16)
-@defaultsize(16)
-def int16Checker(read_bits):
-    return read_bits
-
-@negativenotallowed
-@maxsize(32)
-@defaultsize(32)
-def int32Checker(read_bits):
-    return read_bits
-
-
-@negativenotallowed
-@maxsize(64)
-@defaultsize(64)
-def int64Checker(read_bits):
-    return read_bits
-
-@nonzero
-@negativenotallowed
+@rangesize(1, None)
 def spareChecker(read_bits):
-	return read_bits
+    return read_bits
+
+def paddingChecker(read_bits):
+    return 0
+
+def floatChecker(bits):
+    @defaultsize(bits)
+    @rangesize(bits, bits)
+    def inner_func(read_bits):
+        return read_bits
+    return inner_func
+
+def intChecker(bits):
+    @defaultsize(bits)
+    @rangesize(0, bits)
+    def inner_func(read_bits):
+        return read_bits
+    return inner_func
+
+def boolChecker(bits):
+    @defaultsize(bits)
+    @rangesize(bits, bits)
+    def inner_func(read_bits):
+        return read_bits
+    return inner_func
+
+def xcharChecker(bits):
+    return 8
+
+
+@defaultsize(8)
+@rangesize(8, None)
+def stringChecker(read_bits):
+    return read_bits
+
+def rawAllChecker(read_bits):
+    if read_bits == "*": return 0
+    raise ValueError("read_bits is {0}, and it's not a correct value!".format(read_bits))
+
+@rangesize(8, None)
+def rawChecker(read_bits):
+    return read_bits
 
 SIZE_CHECKERS = {
-"uint8" : int8Checker,
-"uint16": int16Checker,
-"uint32": int32Checker,
-"uint64": int64Checker,
-"spare" : spareChecker
+"padding"   : paddingChecker,
+"spare"     : spareChecker,
+"float32"   : floatChecker(32),
+"float64"   : floatChecker(64),
+"uchar"     : xcharChecker,
+"schar"     : xcharChecker,
+"char"      : xcharChecker,
+"string"    : stringChecker,
+"string_nl" : stringChecker,
+"raw(*)"    : rawAllChecker,
+"raw"       : rawChecker
 }
+
+for i in range(1, 32+1):
+    SIZE_CHECKERS["uint%d"%(i)] = intChecker(i)
+    if i>=2:
+        SIZE_CHECKERS["int%d"%(i)] = intChecker(i)
+
+SIZE_CHECKERS["int40"] = intChecker(40)
+SIZE_CHECKERS["int48"] = intChecker(48)
+SIZE_CHECKERS["uint40"] = intChecker(40)
+SIZE_CHECKERS["uint48"] = intChecker(48)
+SIZE_CHECKERS["uint64"] = intChecker(64)
+
+for i in [1, 8, 16, 32]:
+    SIZE_CHECKERS["bool%i"%i] = boolChecker(i)
