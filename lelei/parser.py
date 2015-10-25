@@ -3,7 +3,7 @@ import re
 from .sizes import SIZE_CHECKERS
 
 def _getroot(str_):
-    return ET.fromstring(str_)	
+    return ET.fromstring(str_)
 
 def bitsForStructure(struct_type, read_bits):
     try:
@@ -12,12 +12,26 @@ def bitsForStructure(struct_type, read_bits):
         raise ValueError("the given structure type {} does not exist".format(struct_type))
 
 def structure_name(doc):
-    names = doc.findall("name")
-    assert len(names) == 1
+    names = doc.findall("structure/name")
+    assert len(names) == 1, len(names)
     return names[0].text
 
+def protocol_info(doc):
+    protocol_info = {"proto_name": None, "proto_short": None}
+    try:
+        protocol_info["proto_name"] = doc.findall("protocolname")[-1].text
+    except IndexError:
+        pass #TODO: should we raise an error there? we should, tho
+
+    try:
+        protocol_info["proto_short"] = doc.findall("protocolshort")[-1].text
+    except IndexError:
+        pass #TODO: raise an error there!
+
+    return protocol_info
+
 def parse_fields(doc):
-    doc_fields = doc.findall("fields/field")
+    doc_fields = doc.findall("structure/fields/field")
     assert len(doc_fields) > 0
     fields = [parse_field(f_) for f_ in doc_fields]
     return fields
@@ -46,6 +60,7 @@ def parse_field(field_doc):
 
 def build_ast(doc):
     ast = dict()
+    ast["proto"] = protocol_info(doc)
     ast["name"] = structure_name(doc)
     ast["fields"] = parse_fields(doc)
     return ast

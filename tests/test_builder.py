@@ -24,17 +24,20 @@ class TestFieldBuilder(unittest.TestCase):
         self.assertEqual("uint8{ns=0} test;", res)
 
 class TestStructBuilder(unittest.TestCase):
-    
+
     def setUp(self):
     	self.xmlOneFieldSource = """
+        <protocol>
     	<structure>
 		  <name>stdUDPHeader</name>
 		  <fields>
 		    <field type="uint16" bits="0">MessageID</field>
 		  </fields>
 		</structure>
+        </protocol>
 		"""
     	self.xmlSource = """
+        <protocol>
     	<structure>
 		  <name>stdUDPHeader</name>
 		  <fields>
@@ -45,6 +48,7 @@ class TestStructBuilder(unittest.TestCase):
 		    <field type="uint32" bits="0">MessageChecksum</field>
 		  </fields>
 		</structure>
+        </protocol>
 		"""
 
     def test_onefield_struct(self):
