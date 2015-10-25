@@ -8,7 +8,12 @@ PLEASE NOTE THAT THIS PROJECT IS NOT FULLY FUNCTIONAL, SO USE IT AT YOUR OWN RIS
 
 Lelei is a [cute sorceress](http://gate-thus-the-jsdf-fought-there.wikia.com/wiki/Lelei_La_Lalena)... no, wait, nevermind.
 Lelei is an automatic WireShark Generic Dissector that, starting from an XML description,
-generates the `.fdesc` and `.wsgd` files you need to perform network analysis
+generates the `.fdesc` and `.wsgd` files you need to perform network analysis.
+
+Please note that Lelei is not a validating generator: it means it may generate generic
+dissectors that violate the WSGD grammar or context (using basic types incorrectly, 
+passing wrong values to transform specifications, ...). If you have a problem,
+please open an issue and we'll help you sorting it out.
 
 ### How to use ###
 
@@ -43,21 +48,19 @@ This is a list of the thing that will be implemented
   - [x] raw(size)
   - [x] padding_bits [type = `padding`]
 
-- [ ] No Statement value
-- [ ] Transform spec
-- [ ] Display spec
-- [ ] Constraint spec
-- [ ] Local byte order spec
+- [ ] Struct
 - [ ] Enum
+- [ ] Transform spec
+- [ ] Arrays
 - [ ] Bit Fields
 
 This is a list of things that will be implemented,
 but not in the nearest future.
 
-- [ ] Arrays
-- [ ] Struct
-- [ ] Switch
-- [ ] Switch with expression
+- [ ] Display spec
+- [ ] Constraint spec
+- [ ] Local byte order spec
+- [ ] No Statement value
 
 The rest of the specification may be not implemented, as it may
 be difficult to express set/var commands and functions while staying
