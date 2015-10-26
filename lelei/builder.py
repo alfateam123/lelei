@@ -22,6 +22,8 @@ PARENT_SUBFIELD_VALUES 20127
 MSG_HEADER_TYPE   {{header.name}}
 MSG_ID_FIELD_NAME {{header.id_field_name}}
 
+MSG_MAIN_TYPE {{struct.name}}
+
 PROTO_TYPE_DEFINITIONS
 
 include {{fname}}.fdesc ;
