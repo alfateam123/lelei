@@ -3,6 +3,7 @@ import pystache
 STRUCT_TEMPLATE = """
 struct {{struct_name}}
 {
+    {{header_field}}
     {{#fields}}
     {{.}}
     {{/fields}}
@@ -28,13 +29,17 @@ include {{fname}}.fdesc ;
 def build_field(field_ast):
     return pystache.render("{{type}} {{name}};", field_ast)
 
-def build_struct(struct_ast):
+def build_struct(struct_ast, header_type_name=None):
     fields = (build_field(f_) for f_ in struct_ast["fields"])
-    return pystache.render(STRUCT_TEMPLATE, struct_name=struct_ast["name"], fields=fields)
+    header_field = build_field({"type":header_type_name, "name":"header"}) if header_type_name else ""
+    return pystache.render(STRUCT_TEMPLATE,
+                           header_field=header_field,
+                           struct_name=struct_ast["name"],
+                           fields=fields)
 
 def build_fdesc(ast):
     header_content = build_struct(ast["header"])
-    struct_content = build_struct(ast["struct"])
+    struct_content = build_struct(ast["struct"], ast["header"]["name"])
     return "\n".join([header_content, struct_content])
 
 def build_wsgd(ast, proto_name):

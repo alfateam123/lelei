@@ -17,20 +17,6 @@ def structure_name(doc, xpath_prefix="structure"):
     assert len(names) == 1, len(names)
     return names[0].text
 
-def protocol_info(doc):
-    protocol_info = {"proto_name": None, "proto_short": None}
-    try:
-        protocol_info["proto_name"] = doc.findall("protocolname")[-1].text
-    except IndexError:
-        pass #TODO: should we raise an error there? we should, tho
-
-    try:
-        protocol_info["proto_short"] = doc.findall("protocolshort")[-1].text
-    except IndexError:
-        pass #TODO: raise an error there!
-
-    return protocol_info
-
 def parse_fields(doc, xpath_prefix="structure"):
     print("{prefix}/name".format(prefix=xpath_prefix))
     doc_fields = doc.findall("{prefix}/fields/field".format(prefix=xpath_prefix))
@@ -60,6 +46,26 @@ def parse_field(field_doc):
                     raise ve
     return field_ast
 
+def header_idfield(doc):
+    idfield_xml = doc.findall("header/id_field_name")
+    assert len(idfield_xml) == 1, "the `header.id_field_name` is not defined in the source file."
+    return idfield_xml[0].text  
+
+def protocol_info(doc):
+    protocol_info = {"proto_name": None, "proto_short": None}
+    try:
+        protocol_info["proto_name"] = doc.findall("protocolname")[-1].text
+    except IndexError:
+        pass #TODO: should we raise an error there? we should, tho
+
+    try:
+        protocol_info["proto_short"] = doc.findall("protocolshort")[-1].text
+    except IndexError:
+        pass #TODO: raise an error there!
+
+    return protocol_info
+
+
 def struct_info(doc, xpath_prefix="structure"):
     struct_ast = dict()
     struct_ast["name"] = structure_name(doc, xpath_prefix)
@@ -68,6 +74,7 @@ def struct_info(doc, xpath_prefix="structure"):
 
 def header_info(doc):
     header_info = struct_info(doc, "header")
+    header_info["id_field_name"] = header_idfield(doc)
     return header_info
 
 def build_ast(doc):

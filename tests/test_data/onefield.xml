@@ -6,6 +6,7 @@
 		<fields>
 			<field type="uint16">PacketID</field>
 		</fields>
+		<id_field_name>PacketID</id_field_name>
 	</header>
 	<structure>
 		<name>stdUDPHeader</name>

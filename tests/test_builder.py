@@ -4,11 +4,11 @@ from lelei import builder as ws
 from lelei import parser
 
 def norm_multiline_str(multiline_str):
-	splitted_str = multiline_str.splitlines()
-	if len(splitted_str[0]) == 0:
-		splitted_str.pop(0)
-	spaces = len(splitted_str[0]) - len(splitted_str[0].lstrip())
-	return "\n".join(chunk[spaces:] for chunk in splitted_str if chunk[spaces:])
+    splitted_str = multiline_str.splitlines()
+    if len(splitted_str[0]) == 0:
+        splitted_str.pop(0)
+    spaces = len(splitted_str[0]) - len(splitted_str[0].lstrip())
+    return "\n".join(chunk[spaces:] for chunk in splitted_str if chunk[spaces:])
 
 class TestFieldBuilder(unittest.TestCase):
 
@@ -34,24 +34,26 @@ class TestStructBuilder(unittest.TestCase):
 
     def test_onefield_struct(self):
         parsed_doc = parser.parse(self.xmlOneFieldSource)
-        res = ws.build_struct(parsed_doc["struct"])
+        res = ws.build_struct(parsed_doc["struct"], parsed_doc["header"]["name"])
         self.assertEqual(res, norm_multiline_str("""
-        	struct stdUDPHeader
-        	{
-        	    uint16 MessageID;
-        	}
-        	""") )
+            struct stdUDPHeader
+            {
+                muhheader header;
+                uint16 MessageID;
+            }
+            """) )
 
     def test_multiplefields_struct(self):
         parsed_doc = parser.parse(self.xmlSource)
-        res = ws.build_struct(parsed_doc["struct"])
+        res = ws.build_struct(parsed_doc["struct"], parsed_doc["header"]["name"])
         self.assertEqual(res, norm_multiline_str("""
-        	struct stdUDPHeader
-        	{
-        	    uint16 MessageID;
-        	    uint16 MessageLenght;
-        	    uint32 MessageCount;
-        	    uint64 MessageSendTime;
-        	    uint32 MessageChecksum;
-        	}
-        	""") )
+            struct stdUDPHeader
+            {
+                muhheader header;
+                uint16 MessageID;
+                uint16 MessageLenght;
+                uint32 MessageCount;
+                uint64 MessageSendTime;
+                uint32 MessageChecksum;
+            }
+            """) )

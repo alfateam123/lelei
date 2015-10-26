@@ -40,3 +40,10 @@ class TestHeaderInfo(unittest.TestCase):
 
     def test_header_isdefined(self):
         self.assertTrue(self.parsed_doc.get("header", False))
+
+    def test_header_name(self):
+        self.assertEqual(self.parsed_doc["header"]["name"], "muhheader")
+
+    def test_header_has_id_field_name(self):
+        self.assertTrue(self.parsed_doc["header"].get("id_field_name", False))
+        self.assertEqual(self.parsed_doc["header"]["id_field_name"], "PacketID")
