@@ -1,0 +1,16 @@
+<protocol>
+	<protocolname>Lelei Protocol</protocolname>
+	<protocolshort>lelei</protocolshort>
+	<header>
+		<name>muhheader</name>
+		<fields>
+			<field type="uint16">PacketID</field>
+		</fields>
+	</header>
+	<structure>
+		<name>stdUDPHeader</name>
+		<fields>
+			<field type="uint16" bits="0">MessageID</field>
+		</fields>
+	</structure>
+</protocol>

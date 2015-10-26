@@ -11,8 +11,9 @@ def bitsForStructure(struct_type, read_bits):
     except KeyError:
         raise ValueError("the given structure type {} does not exist".format(struct_type))
 
-def structure_name(doc):
-    names = doc.findall("structure/name")
+def structure_name(doc, xpath_prefix="structure"):
+    print("{prefix}/name".format(prefix=xpath_prefix))
+    names = doc.findall("{prefix}/name".format(prefix=xpath_prefix))
     assert len(names) == 1, len(names)
     return names[0].text
 
@@ -30,8 +31,9 @@ def protocol_info(doc):
 
     return protocol_info
 
-def parse_fields(doc):
-    doc_fields = doc.findall("structure/fields/field")
+def parse_fields(doc, xpath_prefix="structure"):
+    print("{prefix}/name".format(prefix=xpath_prefix))
+    doc_fields = doc.findall("{prefix}/fields/field".format(prefix=xpath_prefix))
     assert len(doc_fields) > 0
     fields = [parse_field(f_) for f_ in doc_fields]
     return fields
@@ -58,16 +60,21 @@ def parse_field(field_doc):
                     raise ve
     return field_ast
 
-def struct_info(doc):
+def struct_info(doc, xpath_prefix="structure"):
     struct_ast = dict()
-    struct_ast["name"] = structure_name(doc)
-    struct_ast["fields"] = parse_fields(doc)
+    struct_ast["name"] = structure_name(doc, xpath_prefix)
+    struct_ast["fields"] = parse_fields(doc, xpath_prefix)
     return struct_ast
+
+def header_info(doc):
+    header_info = struct_info(doc, "header")
+    return header_info
 
 def build_ast(doc):
     ast = dict()
     ast["proto"]  = protocol_info(doc)
     ast["struct"] = struct_info(doc)
+    ast["header"] = header_info(doc)
     return ast
 
 def parse(str_):

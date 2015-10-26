@@ -26,30 +26,11 @@ class TestFieldBuilder(unittest.TestCase):
 class TestStructBuilder(unittest.TestCase):
 
     def setUp(self):
-    	self.xmlOneFieldSource = """
-        <protocol>
-    	<structure>
-		  <name>stdUDPHeader</name>
-		  <fields>
-		    <field type="uint16" bits="0">MessageID</field>
-		  </fields>
-		</structure>
-        </protocol>
-		"""
-    	self.xmlSource = """
-        <protocol>
-    	<structure>
-		  <name>stdUDPHeader</name>
-		  <fields>
-		    <field type="uint16" bits="0">MessageID</field>
-		    <field type="uint16" bits="0">MessageLenght</field>
-		    <field type="uint32" bits="0">MessageCount</field>
-		    <field type="uint64" bits="0">MessageSendTime</field>
-		    <field type="uint32" bits="0">MessageChecksum</field>
-		  </fields>
-		</structure>
-        </protocol>
-		"""
+        with open("tests/test_data/onefield.xml") as onefield:
+            self.xmlOneFieldSource = onefield.read()
+
+        with open("tests/test_data/stdUDPHeader.xml") as stdUDPHeader:
+            self.xmlSource = stdUDPHeader.read()
 
     def test_onefield_struct(self):
         parsed_doc = parser.parse(self.xmlOneFieldSource)
