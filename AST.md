@@ -35,9 +35,13 @@ Structure definition (still WIP)
   - proto_name 
   - proto_short
 
-- header : same of struct
+- header : same as `struct`. listing additional fields
+  - id_field_name
 
 - struct
   - name
-  - type
-  - bits
+  - fields
+    - field
+      - name
+      - type
+      - bits
