@@ -12,13 +12,11 @@ def bitsForStructure(struct_type, read_bits):
         raise ValueError("the given structure type {} does not exist".format(struct_type))
 
 def structure_name(doc, xpath_prefix="structure"):
-    print("{prefix}/name".format(prefix=xpath_prefix))
     names = doc.findall("{prefix}/name".format(prefix=xpath_prefix))
     assert len(names) == 1, len(names)
     return names[0].text
 
 def parse_fields(doc, xpath_prefix="structure"):
-    print("{prefix}/name".format(prefix=xpath_prefix))
     doc_fields = doc.findall("{prefix}/fields/field".format(prefix=xpath_prefix))
     assert len(doc_fields) > 0
     fields = [parse_field(f_) for f_ in doc_fields]

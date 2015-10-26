@@ -12,8 +12,8 @@ struct {{struct_name}}
 
 WSDG_TEMPLATE = """
 PROTONAME      {{proto.proto_name}}
-PROTOSHORTNAME {{proto.proto_shortname}}
-PROTOABBREV    {{proto.proto_shortname}}
+PROTOSHORTNAME {{proto.proto_short}}
+PROTOABBREV    {{proto.proto_short}}
 
 PARENT_SUBFIELD        tcp.port
 PARENT_SUBFIELD_VALUES 20127
@@ -21,7 +21,7 @@ PARENT_SUBFIELD_VALUES 20127
 MSG_HEADER_TYPE   {{header.name}}
 MSG_ID_FIELD_NAME {{header.id_field_name}}
 
-#PROTO_TYPE_DEFINITIONS
+PROTO_TYPE_DEFINITIONS
 
 include {{fname}}.fdesc ;
 """.strip()
