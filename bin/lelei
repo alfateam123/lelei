@@ -1,4 +1,24 @@
 #!/usr/bin/env python
-import lelei
+from lelei import parser
+from lelei import builder
+import argparse
 
-print("Nothing done yet")
+argparser = argparse.ArgumentParser()
+argparser.add_argument("xml_desc")
+argparser.add_argument("ws_name")
+
+def main(args):
+    with open(args.xml_desc) as xmlsource:
+        xmlSrc = xmlsource.read()
+        ast = parser.parse(xmlSrc)
+
+    with open(args.ws_name+".fdesc", "w") as fdesc_file:
+        fdesc_content = builder.build_fdesc(ast)
+        fdesc_file.write(fdesc_content+"\n")
+
+    with open(args.ws_name+".wsgd", "w") as wsgd_file:
+        wsgd_content = builder.build_wsgd(ast, args.ws_name)
+        wsgd_file.write(wsgd_content+"\n")
+
+if __name__ == '__main__':
+    main(argparser.parse_args())

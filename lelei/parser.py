@@ -3,7 +3,7 @@ import re
 from .sizes import SIZE_CHECKERS
 
 def _getroot(str_):
-    return ET.fromstring(str_)	
+    return ET.fromstring(str_)
 
 def bitsForStructure(struct_type, read_bits):
     try:
@@ -11,13 +11,13 @@ def bitsForStructure(struct_type, read_bits):
     except KeyError:
         raise ValueError("the given structure type {} does not exist".format(struct_type))
 
-def structure_name(doc):
-    names = doc.findall("name")
-    assert len(names) == 1
+def structure_name(doc, xpath_prefix="structure"):
+    names = doc.findall("{prefix}/name".format(prefix=xpath_prefix))
+    assert len(names) == 1, len(names)
     return names[0].text
 
-def parse_fields(doc):
-    doc_fields = doc.findall("fields/field")
+def parse_fields(doc, xpath_prefix="structure"):
+    doc_fields = doc.findall("{prefix}/fields/field".format(prefix=xpath_prefix))
     assert len(doc_fields) > 0
     fields = [parse_field(f_) for f_ in doc_fields]
     return fields
@@ -44,10 +44,57 @@ def parse_field(field_doc):
                     raise ve
     return field_ast
 
+def struct_byteorder(doc):
+    byteorder_xml = doc.findall("structure/byte_order")
+    if len(byteorder_xml) >= 1:
+        assert len(byteorder_xml) == 1, "`structure.byte_order` is defined too many times!"
+        if byteorder_xml[0].text not in ["as_host", "big_endian", "little_endian"]:
+            raise ValueError("the specified `byte_order` is not valid: %s"%byteorder_xml[0].text)
+        return byteorder_xml[0].text
+    else:
+        #default value
+        return "big_endian"
+
+def header_idfield(doc):
+    idfield_xml = doc.findall("header/id_field_name")
+    assert len(idfield_xml) == 1, "the `header.id_field_name` is not defined in the source file."
+    return idfield_xml[0].text  
+
+def protocol_info(doc):
+    protocol_info = {"proto_name": None, "proto_short": None}
+    try:
+        protocol_info["proto_name"] = doc.findall("protocolname")[-1].text
+    except IndexError:
+        raise ValueError("`protocol/protocolname` value cannot be found. Please review the XML document.")
+
+    try:
+        protocol_info["proto_short"] = doc.findall("protocolshort")[-1].text
+    except IndexError:
+        if protocol_info["proto_name"].count(" "):
+            protocol_info["proto_short"] = "".join(chunk[0] for chunk in protocol_info["proto_name"].split(" ") if chunk)
+        else:
+            protocol_info["proto_short"] = protocol_info["proto_name"]
+
+    return protocol_info
+
+
+def struct_info(doc, xpath_prefix="structure"):
+    struct_ast = dict()
+    struct_ast["name"] = structure_name(doc, xpath_prefix)
+    struct_ast["fields"] = parse_fields(doc, xpath_prefix)
+    struct_ast["byte_order"] = struct_byteorder(doc)
+    return struct_ast
+
+def header_info(doc):
+    header_info = struct_info(doc, "header")
+    header_info["id_field_name"] = header_idfield(doc)
+    return header_info
+
 def build_ast(doc):
     ast = dict()
-    ast["name"] = structure_name(doc)
-    ast["fields"] = parse_fields(doc)
+    ast["proto"]  = protocol_info(doc)
+    ast["struct"] = struct_info(doc)
+    ast["header"] = header_info(doc)
     return ast
 
 def parse(str_):
