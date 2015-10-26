@@ -14,5 +14,4 @@ install:
   - pip install --upgrade .
 # command to run tests
 script:
-  #- mkdir -p tests/test_data/images/emptyFolder
   - python setup.py test

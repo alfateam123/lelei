@@ -11,6 +11,7 @@ struct {{struct_name}}
 }
 """.strip()
 
+<<<<<<< HEAD
 WSDG_TEMPLATE = """
 PROTONAME      {{proto.proto_name}}
 PROTOSHORTNAME {{proto.proto_short}}
