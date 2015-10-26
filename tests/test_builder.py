@@ -53,7 +53,7 @@ class TestStructBuilder(unittest.TestCase):
 
     def test_onefield_struct(self):
         parsed_doc = parser.parse(self.xmlOneFieldSource)
-        res = ws.build_struct(parsed_doc)
+        res = ws.build_struct(parsed_doc["struct"])
         self.assertEqual(res, norm_multiline_str("""
         	struct stdUDPHeader
         	{
@@ -63,7 +63,7 @@ class TestStructBuilder(unittest.TestCase):
 
     def test_multiplefields_struct(self):
         parsed_doc = parser.parse(self.xmlSource)
-        res = ws.build_struct(parsed_doc)
+        res = ws.build_struct(parsed_doc["struct"])
         self.assertEqual(res, norm_multiline_str("""
         	struct stdUDPHeader
         	{

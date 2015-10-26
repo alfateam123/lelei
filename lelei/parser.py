@@ -58,11 +58,16 @@ def parse_field(field_doc):
                     raise ve
     return field_ast
 
+def struct_info(doc):
+    struct_ast = dict()
+    struct_ast["name"] = structure_name(doc)
+    struct_ast["fields"] = parse_fields(doc)
+    return struct_ast
+
 def build_ast(doc):
     ast = dict()
-    ast["proto"] = protocol_info(doc)
-    ast["name"] = structure_name(doc)
-    ast["fields"] = parse_fields(doc)
+    ast["proto"]  = protocol_info(doc)
+    ast["struct"] = struct_info(doc)
     return ast
 
 def parse(str_):
