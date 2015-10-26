@@ -45,3 +45,4 @@ Structure definition (still WIP)
       - name
       - type
       - bits
+      - byte_order

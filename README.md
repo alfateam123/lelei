@@ -49,6 +49,7 @@ This is a list of the thing that will be implemented
   - [x] padding_bits [type = `padding`]
 
 - [x] Struct
+- [x] Local byte order spec
 - [ ] Enum
 - [ ] Transform spec
 - [ ] Arrays
@@ -59,7 +60,6 @@ but not in the nearest future.
 
 - [ ] Display spec
 - [ ] Constraint spec
-- [ ] Local byte order spec
 - [ ] No Statement value
 
 The rest of the specification may be not implemented, as it may

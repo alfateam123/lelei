@@ -44,6 +44,16 @@ def parse_field(field_doc):
                     raise ve
     return field_ast
 
+def struct_byteorder(doc):
+    byteorder_xml = doc.findall("structure/byte_order")
+    if len(byteorder_xml) >= 1:
+        assert len(byteorder_xml) == 1, "`structure.byte_order` is defined too many times!"
+        assert byteorder_xml[0].text in ["big_endian", "little_endian"]
+        return byteorder_xml[0].text
+    else:
+        #default value
+        return "big_endian"
+
 def header_idfield(doc):
     idfield_xml = doc.findall("header/id_field_name")
     assert len(idfield_xml) == 1, "the `header.id_field_name` is not defined in the source file."
@@ -68,6 +78,7 @@ def struct_info(doc, xpath_prefix="structure"):
     struct_ast = dict()
     struct_ast["name"] = structure_name(doc, xpath_prefix)
     struct_ast["fields"] = parse_fields(doc, xpath_prefix)
+    struct_ast["byte_order"] = struct_byteorder(doc)
     return struct_ast
 
 def header_info(doc):

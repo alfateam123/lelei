@@ -3,6 +3,7 @@ import pystache
 STRUCT_TEMPLATE = """
 struct {{struct_name}}
 {
+    {{byte_order}}
     {{header_field}}
     {{#fields}}
     {{.}}
@@ -32,9 +33,11 @@ def build_field(field_ast):
 def build_struct(struct_ast, header_type_name=None):
     fields = (build_field(f_) for f_ in struct_ast["fields"])
     header_field = build_field({"type":header_type_name, "name":"header"}) if header_type_name else ""
+    byteorder_field = build_field({"type":"byte_order", "name":struct_ast["byte_order"]})
     return pystache.render(STRUCT_TEMPLATE,
                            header_field=header_field,
                            struct_name=struct_ast["name"],
+                           byte_order=byteorder_field,
                            fields=fields)
 
 def build_fdesc(ast):

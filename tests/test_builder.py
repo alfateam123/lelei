@@ -39,6 +39,7 @@ class TestStructBuilder(unittest.TestCase):
         self.assertEqual(res, norm_multiline_str("""
             struct stdUDPHeader
             {
+                byte_order big_endian;
                 muhheader header;
                 uint16 MessageID;
             }
@@ -50,6 +51,7 @@ class TestStructBuilder(unittest.TestCase):
         self.assertEqual(res, norm_multiline_str("""
             struct stdUDPHeader
             {
+                byte_order big_endian;
                 muhheader header;
                 uint16 MessageID;
                 uint16 MessageLenght;
