@@ -48,7 +48,8 @@ def struct_byteorder(doc):
     byteorder_xml = doc.findall("structure/byte_order")
     if len(byteorder_xml) >= 1:
         assert len(byteorder_xml) == 1, "`structure.byte_order` is defined too many times!"
-        assert byteorder_xml[0].text in ["big_endian", "little_endian"]
+        if byteorder_xml[0].text not in ["as_host", "big_endian", "little_endian"]:
+            raise ValueError("the specified `byte_order` is not valid: %s"%byteorder_xml[0].text)
         return byteorder_xml[0].text
     else:
         #default value
@@ -64,12 +65,15 @@ def protocol_info(doc):
     try:
         protocol_info["proto_name"] = doc.findall("protocolname")[-1].text
     except IndexError:
-        pass #TODO: should we raise an error there? we should, tho
+        raise ValueError("`protocol/protocolname` value cannot be found. Please review the XML document.")
 
     try:
         protocol_info["proto_short"] = doc.findall("protocolshort")[-1].text
     except IndexError:
-        pass #TODO: raise an error there!
+        if protocol_info["proto_name"].count(" "):
+            protocol_info["proto_short"] = "".join(chunk[0] for chunk in protocol_info["proto_name"].split(" ") if chunk)
+        else:
+            protocol_info["proto_short"] = protocol_info["proto_name"]
 
     return protocol_info
 

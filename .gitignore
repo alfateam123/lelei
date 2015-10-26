@@ -34,3 +34,10 @@ nosetests.xml
 .mr.developer.cfg
 .project
 .pydevproject
+
+#other folders
+.lelei/
+.eggs/
+*.xml
+dissectors/
+.ropeproject/
