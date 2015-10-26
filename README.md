@@ -2,6 +2,8 @@ Lelei: XML -> WireShark Generic Dissector
 =========================================
 
 ### Disclaimer ###
+[![Build Status](https://travis-ci.org/alfateam123/lelei.svg?branch=master)](https://travis-ci.org/alfateam123/lelei)
+
 PLEASE NOTE THAT THIS PROJECT IS NOT FULLY FUNCTIONAL, SO USE IT AT YOUR OWN RISK. CONSIDER IT TO BE INCOMPLET AND INKORRECT. YOU HAVE BEEN WARNED.
 
 ### What is that? ###
@@ -18,7 +20,7 @@ please open an issue and we'll help you sorting it out.
 ### How to use ###
 
 1. Define your packet structure in XML
-2. `lelei rory.xml`
+2. `lelei rory.xml rory`
 3. Copy the resulting `rory.fdesc` and `rory.wsgd` to your Wireshark folders
 4. Open Wireshark and analyze your net traffic!
 
@@ -31,7 +33,7 @@ which translates C structures to Lua-based dissectors.
 
 ### Important things: state of work ###
 
-Does it write things yet? **No**.
+Does it write things yet? **Yes**.
 
 How much of the grammar has been implemented?  
 This is a list of the thing that will be implemented
@@ -62,6 +64,6 @@ but not in the nearest future.
 - [ ] Constraint spec
 - [ ] No Statement value
 
-The rest of the specification may be not implemented, as it may
-be difficult to express set/var commands and functions while staying
-inside the XML structure, and Lelei is not a tool for that.
+The rest of the specification may come even later, if it's ever implemented.
+If you really need it _now_, please feel free to contribute with a Pull Request
+via Github.
