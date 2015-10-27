@@ -115,15 +115,15 @@ def header_info(doc):
     header_info["id_field_name"] = header_idfield(doc)
     return header_info
 
+def global_enums(doc):
+    return [parse_enum(enum_doc) for enum_doc in doc.findall("enums/enum")]
+
 def build_ast(doc):
     ast = dict()
     ast["proto"]  = protocol_info(doc)
     ast["struct"] = struct_info(doc)
     ast["header"] = header_info(doc)
-    try:
-        ast["enum"] = parse_enum(doc.findall("enum")[-1])
-    except IndexError:
-        ast["enum"] = None
+    ast["enums"]  = global_enums(doc)
     return ast
 
 def parse(str_):

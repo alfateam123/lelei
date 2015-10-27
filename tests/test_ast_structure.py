@@ -31,10 +31,10 @@ class TestASTChecker(unittest.TestCase):
         self.assertTrue(self.parsed_doc.get("header", False))
         self.assertTrue(self.parsed_doc["header"].get("id_field_name", False))
 
-    def test_ast_has_enum(self):
+    def test_ast_has_enums(self):
         #no enum is legit, so we just check the field is there,
         # not its truthness
-        self.assertTrue("enum" in self.parsed_doc.keys())
+        self.assertTrue("enums" in self.parsed_doc.keys())
 
 class TestStructParser(unittest.TestCase):
 
@@ -124,7 +124,65 @@ class TestHeaderInfo(unittest.TestCase):
         parsed_doc = ET.fromstring("<protocol><structure><byte_order>error_endian</byte_order></structure></protocol>")
         self.assertRaises(AssertionError, lambda : structureparser.header_idfield(parsed_doc))
 
-class TestEnum(unittest.TestCase):
+class TestEnums(unittest.TestCase):
+    def setUp(self):
+        self.xmlSingleEnum = """
+        <protocol><enums><enum>
+          <name>messageid_enum</name>
+          <values>
+            <value id="100">Not_Enough</value>
+            <value id="200">Some</value>
+            <value id="300">Warmongers</value>
+          </values>
+        </enum></enums></protocol>
+        """
+
+        self.xmlMultipleEnums = """
+        <protocol><enums>
+          <enum>
+            <name>messageid_enum_multi</name>
+            <values><value id="100">Maybe_is_Enough</value></values>
+          </enum>
+          <enum>
+            <name>messageid_enum_2</name>
+            <values><value id="0x200">woot</value></values>
+          </enum>
+        </enums></protocol>
+        """
+
+        self.noEnums = "<protocol><enums></enums></protocol>"
+
+    def test_noEnums(self):
+        xml_doc = ET.fromstring(self.noEnums)
+        parsed_doc = structureparser.global_enums(xml_doc)
+        self.assertEqual(len(parsed_doc), 0)
+
+    def test_singleEnum(self):
+        xml_doc = ET.fromstring(self.xmlSingleEnum)
+        parsed_doc = structureparser.global_enums(xml_doc)
+        self.assertEqual(len(parsed_doc), 1)
+        self.assertEqual(parsed_doc[0]["name"], "messageid_enum")
+
+    def test_singleEnum_areEnumsReadCorrectly(self):
+        xml_doc = ET.fromstring(self.xmlSingleEnum)
+        enum_ast = structureparser.global_enums(xml_doc)[0]["values"][-1]
+        self.assertEqual(enum_ast["id"], 300)
+        self.assertEqual(enum_ast["name"], "Warmongers")
+
+    def test_multipleEnums(self):
+        xml_doc = ET.fromstring(self.xmlMultipleEnums)
+        parsed_doc = structureparser.global_enums(xml_doc)
+        self.assertEqual(len(parsed_doc), 2)
+        self.assertEqual(parsed_doc[0]["name"], "messageid_enum_multi")
+        self.assertEqual(parsed_doc[1]["name"], "messageid_enum_2")
+
+    def test_multipleEnums_areEnumsReadCorrectly(self):
+        xml_doc = ET.fromstring(self.xmlMultipleEnums)
+        parsed_doc = structureparser.global_enums(xml_doc)
+        self.assertEqual(parsed_doc[0]["values"][0]["name"], "Maybe_is_Enough")
+        self.assertEqual(parsed_doc[1]["values"][0]["id"], 0x200)
+
+class TestSingleEnum(unittest.TestCase):
 
     def setUp(self):
         self.xmlWrongID = """<value id="asdf">woot_woot</value>""" 
