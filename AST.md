@@ -46,3 +46,10 @@ Structure definition (still WIP)
       - type
       - bits
       - byte_order
+
+- enum
+  - name
+  - values
+    - value
+      - id [number, base-10 or base-16]
+      - name

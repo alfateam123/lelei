@@ -60,6 +60,32 @@ def header_idfield(doc):
     assert len(idfield_xml) == 1, "the `header.id_field_name` is not defined in the source file."
     return idfield_xml[0].text  
 
+def parse_enum_pair(enum_keyvalue_doc):
+    ast = {"name": enum_keyvalue_doc.text, "id":None}
+
+    #IDs have to be decimal or hexadecimal.
+    try:
+        ast["id"] = int(enum_keyvalue_doc.attrib["id"])
+    except ValueError:
+        try:
+            ast["id"] = int(enum_keyvalue_doc.attrib["id"], 16)
+        except ValueError:
+            raise ValueError("the given ID for value {0} is"
+                             " not decimal or hexadecimal: {1}".format(ast["name"],
+                                enum_keyvalue_doc.attrib["id"]))
+    return ast
+
+def parse_enum(enum_doc):
+    enum_ast = {
+        "values":[],
+        "name": enum_doc.findall("name")[0].text
+    }
+
+    for value_doc in enum_doc.findall("values/value"):
+        enum_ast["values"].append(parse_enum_pair(value_doc))
+
+    return enum_ast
+
 def protocol_info(doc):
     protocol_info = {"proto_name": None, "proto_short": None}
     try:

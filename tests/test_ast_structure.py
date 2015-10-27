@@ -90,3 +90,40 @@ class TestHeaderInfo(unittest.TestCase):
         parsed_doc = ET.fromstring("<protocol><structure><byte_order>error_endian</byte_order></structure></protocol>")
         self.assertRaises(AssertionError, lambda : structureparser.header_idfield(parsed_doc))
 
+class TestEnum(unittest.TestCase):
+
+    def setUp(self):
+        self.xmlWrongID = """<value id="asdf">woot_woot</value>""" 
+        self.xmlHexaID = """<value id="0x300">w00t</value>"""
+        self.xmlSingleEnum = """
+        <enum>
+          <name>messageid_enum</name>
+          <values>
+            <value id="100">Not_Enough</value>
+            <value id="200">Some</value>
+            <value id="300">Warmongers</value>
+          </values>
+        </enum>
+        """
+
+    def test_enum_nameIsReadCorrectly(self):
+        xml_doc = ET.fromstring(self.xmlSingleEnum)
+        ast = structureparser.parse_enum(xml_doc)
+        self.assertEqual(ast["name"], "messageid_enum")
+
+    def test_enum_valuesReadCorrectly(self):
+        xml_doc = ET.fromstring(self.xmlSingleEnum)
+        ast = structureparser.parse_enum(xml_doc)
+        self.assertEqual(len(ast["values"]), 3)
+        self.assertEqual(ast["values"][-1]["id"], 300)
+        self.assertEqual(ast["values"][0]["name"], "Not_Enough")
+
+    def test_enum_wrongID(self):
+        xml_doc = ET.fromstring(self.xmlWrongID)
+        self.assertRaises(ValueError, lambda : structureparser.parse_enum_pair(xml_doc))
+
+    def test_enum_hexaID(self):
+        xml_doc = ET.fromstring(self.xmlHexaID)
+        ast = structureparser.parse_enum_pair(xml_doc)
+        self.assertEqual(ast["id"], 0x300)
+
