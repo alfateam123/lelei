@@ -42,6 +42,7 @@ Structure definition (still WIP)
   - name
   - fields
     - field
+      - repeated
       - name
       - type
       - bits
