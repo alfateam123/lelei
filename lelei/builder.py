@@ -1,13 +1,13 @@
 import pystache
 
 ENUM_TEMPLATE = """
-enum {{name}}
+enum{{ast.size}} {{ast.name}}
 {
   {{#values}}
-  {{}}
+  {{.}}
   {{/values}}
 }
-"""
+""".strip()
 
 STRUCT_TEMPLATE = """
 struct {{struct_name}}
@@ -51,10 +51,16 @@ def build_struct(struct_ast, header_type_name=None):
                            byte_order=byteorder_field,
                            fields=fields)
 
+def build_enum(enum_ast):
+    #one day, I'll understand how to do the same thing using mustache only.
+    values = [build_field({"type":value_ast["name"], "name":value_ast["id"]}) for value_ast in enum_ast["values"]]
+    return pystache.render(ENUM_TEMPLATE, ast=enum_ast, values=values)
+
 def build_fdesc(ast):
     header_content = build_struct(ast["header"])
     struct_content = build_struct(ast["struct"], ast["header"]["name"])
-    return "\n".join([header_content, struct_content])
+    enums_content  = "\n".join(build_enum(enum_ast) for enum_ast in ast["enums"])
+    return "\n".join([enums_content, header_content, struct_content])
 
 def build_wsgd(ast, proto_name):
     return pystache.render(WSDG_TEMPLATE,
