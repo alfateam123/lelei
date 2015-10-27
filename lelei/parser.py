@@ -103,7 +103,6 @@ def protocol_info(doc):
 
     return protocol_info
 
-
 def struct_info(doc, xpath_prefix="structure"):
     struct_ast = dict()
     struct_ast["name"] = structure_name(doc, xpath_prefix)
@@ -121,6 +120,10 @@ def build_ast(doc):
     ast["proto"]  = protocol_info(doc)
     ast["struct"] = struct_info(doc)
     ast["header"] = header_info(doc)
+    try:
+        ast["enum"] = parse_enum(doc.findall("enum")[-1])
+    except IndexError:
+        ast["enum"] = None
     return ast
 
 def parse(str_):

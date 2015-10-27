@@ -2,6 +2,40 @@ import unittest
 import xml.etree.ElementTree as ET
 from lelei import parser as structureparser
 
+class TestASTChecker(unittest.TestCase):
+    """
+    this testcase checks for things that are common
+    to _every_ correctly parsed document: the AST.
+    """
+
+    def setUp(self):
+        with open("tests/test_data/stdUDPHeader.xml") as test_data:
+            self.xmlSource = test_data.read()
+        self.parsed_doc = structureparser.parse(self.xmlSource)
+
+    def test_ast_has_proto(self):
+        self.assertTrue(self.parsed_doc.get("proto", False))
+        self.assertTrue(self.parsed_doc["proto"].get("proto_name", False))
+        self.assertTrue(self.parsed_doc["proto"].get("proto_short", False))
+
+    def test_ast_has_struct(self):
+        self.assertTrue(self.parsed_doc.get("struct", False))
+        self.assertTrue(self.parsed_doc["struct"].get("name", False))
+        #py3k removes dict.has_key. guido, come on...
+        #the first version was self.parsed_doc["struct"].get("fields", False)
+        #but... what if you have an empty structure? to be sure,
+        # we just check that the "fields" key is present.
+        self.assertTrue("fields" in self.parsed_doc["struct"].keys())
+
+    def test_ast_has_header(self):
+        self.assertTrue(self.parsed_doc.get("header", False))
+        self.assertTrue(self.parsed_doc["header"].get("id_field_name", False))
+
+    def test_ast_has_enum(self):
+        #no enum is legit, so we just check the field is there,
+        # not its truthness
+        self.assertTrue("enum" in self.parsed_doc.keys())
+
 class TestStructParser(unittest.TestCase):
 
     def setUp(self):
