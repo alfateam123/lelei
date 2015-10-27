@@ -54,8 +54,8 @@ This is a list of the thing that will be implemented
 - [x] Local byte order spec
 - [ ] Enum
 - [ ] Transform spec
-- [ ] Arrays
-- [ ] Bit Fields
+- [x] Arrays
+- [ ] Multiple structures support
 
 This is a list of things that will be implemented,
 but not in the nearest future.
