@@ -40,6 +40,25 @@ class TestStructParser(unittest.TestCase):
         parsed_doc = ET.fromstring("<protocol><structure><byte_order>error_endian</byte_order></structure></protocol>")
         self.assertRaises(ValueError, lambda : structureparser.struct_byteorder(parsed_doc))
 
+    def test_struct_field_repeated_default(self):
+        #no one has a `repeated` attribute, so it's ok for a "default :D"
+        self.assertEqual(self.parsed_doc["struct"]["fields"][0]["repeated"], 1)
+
+    def test_struct_field_repeated(self):
+        xml_doc = ET.fromstring("""<field repeated="5" type="uint8">spare</field>""")
+        self.assertEqual(structureparser.struct_field_repeated(xml_doc), 5)
+
+    def test_struct_field_repeated_zero(self):
+        xml_doc = ET.fromstring("""<field repeated="0" type="uint8">spare</field>""")
+        self.assertRaises(ValueError, lambda : structureparser.struct_field_repeated(xml_doc))
+
+    def test_struct_field_repeated_negative(self):
+        xml_doc = ET.fromstring("""<field repeated="-15" type="uint8">spare</field>""")
+        self.assertRaises(ValueError, lambda : structureparser.struct_field_repeated(xml_doc))
+
+    def test_struct_field_repeated_useavariable(self):
+        xml_doc = ET.fromstring("""<field repeated="number_of_numbers" type="uint8">spare</field>""")
+        self.assertEqual(structureparser.struct_field_repeated(xml_doc), "number_of_numbers")
 
 class TestProtocolInfo(unittest.TestCase):
 

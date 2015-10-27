@@ -22,26 +22,49 @@ def parse_fields(doc, xpath_prefix="structure"):
     fields = [parse_field(f_) for f_ in doc_fields]
     return fields
 
-def parse_field(field_doc):
-    field_ast = dict()
-    field_ast["name"] = field_doc.text
-    field_ast["type"] = field_doc.attrib["type"]
+def struct_field_lenght(field_doc, field_ast):
+    lenght_ast = dict()
     #some fields (e.g. float32) have a fixed size, so it's useless
     # to set `bits=0` while defining such fields.
     try:
         #obviously, the KeyError is related to `bits` and not to `type`.
-        field_ast["bits"] = bitsForStructure(field_doc.attrib["type"], int(field_doc.attrib["bits"]))
+        lenght_ast["bits"] = bitsForStructure(field_doc.attrib["type"], int(field_doc.attrib["bits"]))
     except KeyError:
         try:
-            field_ast["bits"] = bitsForStructure(field_doc.attrib["type"], 8*int(field_doc.attrib["lenght"]))
+            lenght_ast["bits"] = bitsForStructure(field_doc.attrib["type"], 8*int(field_doc.attrib["lenght"]))
         except KeyError:
             try:
-                field_ast["bits"] = bitsForStructure(field_doc.attrib["type"], 0)
+                lenght_ast["bits"] = bitsForStructure(field_doc.attrib["type"], 0)
             except ValueError as ve:
                 if field_ast["type"] == "raw(*)":
-                    field_ast["bits"] = 8
+                    lenght_ast["bits"] = 8
                 else:
                     raise ve
+    return lenght_ast
+
+def struct_field_repeated(field_doc):
+    #try to read it from the attributes. if it's not there, return a default
+    try:
+        rep_value = field_doc.attrib["repeated"]
+    except KeyError:
+        return 1
+
+    #try to check if it's an integer. if it's not, return it
+    try:
+        rep_value = int(rep_value)
+    except ValueError:
+        return rep_value
+
+    if rep_value <= 0:
+        raise ValueError("the given `field.repeated` value ({0}) is not a natural number!".format(rep_value))
+    return rep_value
+
+def parse_field(field_doc):
+    field_ast = dict()
+    field_ast["name"] = field_doc.text
+    field_ast["type"] = field_doc.attrib["type"]
+    field_ast["bits"] = struct_field_lenght(field_doc, field_ast)["bits"]
+    field_ast["repeated"] = struct_field_repeated(field_doc)
     return field_ast
 
 def struct_byteorder(doc):
