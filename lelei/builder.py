@@ -36,7 +36,9 @@ def build_simple_field(type_, name_):
 
 def build_field(field_ast):
     type_ = field_ast["type"]
-    if field_ast["repeated"] > 1:
+    try:
+        type_ += "[{0}]".format(field_ast["repeated"]) if field_ast["repeated"]>1 else ""
+    except TypeError: #comparing strings and ints
         type_ += "[{0}]".format(field_ast["repeated"])
     return pystache.render("{{type}} {{name}};", field_ast, type=type_)
 

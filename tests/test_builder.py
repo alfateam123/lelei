@@ -28,6 +28,11 @@ class TestFieldBuilder(unittest.TestCase):
         res = ws.build_field(parsed_doc)
         self.assertEqual("uint8[5] test;", res)
 
+    def test_int8_repeated_variable(self):
+        parsed_doc = parser.parse_field(ET.fromstring('<field type="uint8" repeated="num_of_nums">test</field>'))
+        res = ws.build_field(parsed_doc)
+        self.assertEqual("uint8[num_of_nums] test;", res)
+
     # @unittest.skip("no_statement has not been implemented yet, left for later")
     # def test_int8_nostmt(self):
     #     parsed_doc = parser.parse_field(ET.fromstring('<field type="uint8"  bits="0" nostmt="2">test</field>'))
