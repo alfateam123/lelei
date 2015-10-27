@@ -43,10 +43,21 @@ def struct_field_lenght(field_doc, field_ast):
     return lenght_ast
 
 def struct_field_repeated(field_doc):
+    #try to read it from the attributes. if it's not there, return a default
     try:
-        return int(field_doc.attrib["repeated"])
-    except: #unspecified, say default
+        rep_value = field_doc.attrib["repeated"]
+    except KeyError:
         return 1
+
+    #try to check if it's an integer. if it's not, return it
+    try:
+        rep_value = int(rep_value)
+    except ValueError:
+        return rep_value
+
+    if rep_value <= 0:
+        raise ValueError("the given `field.repeated` value ({0}) is not a natural number!".format(rep_value))
+    return rep_value
 
 def parse_field(field_doc):
     field_ast = dict()
