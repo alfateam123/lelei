@@ -49,6 +49,7 @@ Structure definition (still WIP)
 
 - enums
   - enum
+    - size [bits]
     - name
     - values
       - value

@@ -1,5 +1,14 @@
 import pystache
 
+ENUM_TEMPLATE = """
+enum {{name}}
+{
+  {{#values}}
+  {{}}
+  {{/values}}
+}
+"""
+
 STRUCT_TEMPLATE = """
 struct {{struct_name}}
 {

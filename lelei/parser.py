@@ -81,6 +81,12 @@ def parse_enum(enum_doc):
         "name": enum_doc.findall("name")[0].text
     }
 
+    try:
+        enum_ast["size"] = int(enum_doc.findall("size")[0].text)
+        assert 1 <= enum_ast["size"] <= 32
+    except IndexError:
+        enum_ast["size"] = 32
+
     for value_doc in enum_doc.findall("values/value"):
         enum_ast["values"].append(parse_enum_pair(value_doc))
 

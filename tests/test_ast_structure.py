@@ -184,11 +184,14 @@ class TestEnums(unittest.TestCase):
 
 class TestSingleEnum(unittest.TestCase):
 
+    #TODO: what if we get an enum with no fields?
+
     def setUp(self):
         self.xmlWrongID = """<value id="asdf">woot_woot</value>""" 
         self.xmlHexaID = """<value id="0x300">w00t</value>"""
         self.xmlSingleEnum = """
         <enum>
+          <size>8</size>
           <name>messageid_enum</name>
           <values>
             <value id="100">Not_Enough</value>
@@ -197,6 +200,42 @@ class TestSingleEnum(unittest.TestCase):
           </values>
         </enum>
         """
+        self.xmlDefaultSize = """
+        <enum>
+          <name>messageid_enum</name>
+          <values>
+            <value id="500">Not_Found</value>
+          </values>
+        </enum>
+        """
+        self.xmlErroneousSize_toobig = """
+        <enum>
+          <size>64</size>
+          <name>messageid_enum</name>
+          <values>
+            <value id="500">Not_Found</value>
+          </values>
+        </enum>
+        """
+        self.xmlErroneousSize_toolow = """
+        <enum>
+          <size>-1</size>
+          <name>messageid_enum</name>
+          <values>
+            <value id="500">Not_Found</value>
+          </values>
+        </enum>
+        """
+        self.xmlErroneousSize_zero = """
+        <enum>
+          <size>0</size>
+          <name>messageid_enum</name>
+          <values>
+            <value id="500">Not_Found</value>
+          </values>
+        </enum>
+        """
+
 
     def test_enum_nameIsReadCorrectly(self):
         xml_doc = ET.fromstring(self.xmlSingleEnum)
@@ -218,4 +257,26 @@ class TestSingleEnum(unittest.TestCase):
         xml_doc = ET.fromstring(self.xmlHexaID)
         ast = structureparser.parse_enum_pair(xml_doc)
         self.assertEqual(ast["id"], 0x300)
+
+    def test_enum_size(self):
+        xml_doc = ET.fromstring(self.xmlSingleEnum)
+        ast = structureparser.parse_enum(xml_doc)
+        self.assertEqual(ast["size"], 8)
+
+    def test_enum_size_default(self):
+        xml_doc = ET.fromstring(self.xmlDefaultSize)
+        ast = structureparser.parse_enum(xml_doc)
+        self.assertEqual(ast["size"], 32)
+
+    def test_enum_size_tooBig(self):
+        xml_doc = ET.fromstring(self.xmlErroneousSize_toobig)
+        self.assertRaises(AssertionError, lambda : structureparser.parse_enum(xml_doc))
+
+    def test_enum_size_tooLow(self):
+        xml_doc = ET.fromstring(self.xmlErroneousSize_toolow)
+        self.assertRaises(AssertionError, lambda : structureparser.parse_enum(xml_doc))
+
+    def test_enum_size_zero(self):
+        xml_doc = ET.fromstring(self.xmlErroneousSize_zero)
+        self.assertRaises(AssertionError, lambda : structureparser.parse_enum(xml_doc))
 
