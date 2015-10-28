@@ -15,6 +15,10 @@ class TestStructParser(unittest.TestCase):
     def test_nameIsCorrect(self):
         self.assertEqual(self.parsed_doc["structures"][0]["name"], "stdUDPHeader")
 
+    def test_struct_id_isCorrect(self):
+        self.assertEqual(self.parsed_doc["structures"][0]["struct_id"], 10100)
+        self.assertEqual(self.parsed_doc["structures"][1]["struct_id"], 10200)
+
     def test_numberOfFields(self):
         self.assertEqual(len(self.parsed_doc["structures"][0]["fields"]), 5)
 

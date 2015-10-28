@@ -10,6 +10,7 @@
   </header>
   <structures>
     <structure>
+      <struct_id>10100</struct_id>
       <name>stdUDPHeader</name>
       <fields>
         <field type="uint16" bits="0">MessageID</field>
@@ -21,6 +22,7 @@
     </structure>
     <structure>
       <name>randomPacket</name>
+      <struct_id>10200</struct_id>
       <fields>
         <field type="bool8">dataValidity</field>
       </fields>

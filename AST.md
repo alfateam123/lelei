@@ -41,6 +41,7 @@ Structure definition (still WIP)
 - structures
   - struct
     - name
+    - struct_id
     - fields
       - field
         - repeated

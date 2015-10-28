@@ -10,6 +10,7 @@
 	</header>
 	<structures>
 		<structure>
+			<struct_id>30300</struct_id>
 			<name>stdUDPHeader</name>
 			<fields>
 				<field type="uint16" bits="0">MessageID</field>

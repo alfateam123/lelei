@@ -16,6 +16,11 @@ def structure_name(doc):
     assert len(names) == 1, len(names)
     return names[0].text
 
+def structure_id(doc):
+    ids = doc.findall("struct_id")
+    assert len(ids) == 1, len(ids)
+    return int(ids[0].text)
+
 def parse_fields(doc):
     doc_fields = doc.findall("fields/field")
     assert len(doc_fields) > 0
@@ -103,8 +108,12 @@ def protocol_info(doc):
 
 def struct_info(struct_doc):
     struct_ast = dict()
-    struct_ast["name"] = structure_name(struct_doc)
-    struct_ast["fields"] = parse_fields(struct_doc)
+    struct_ast["name"]       = structure_name(struct_doc)
+    struct_ast["fields"]     = parse_fields(struct_doc)
+    try:
+        struct_ast["struct_id"]  = structure_id(struct_doc)
+    except AssertionError: #we got an header. silly us.
+        struct_ast["struct_id"]  = None
     struct_ast["byte_order"] = struct_byteorder(struct_doc)
     return struct_ast
 
