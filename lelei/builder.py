@@ -54,8 +54,8 @@ def build_struct(struct_ast, header_type_name=None):
 
 def build_fdesc(ast):
     header_content = build_struct(ast["header"])
-    struct_content = build_struct(ast["struct"], ast["header"]["name"])
-    return "\n".join([header_content, struct_content])
+    structures_content = "\n".join(build_struct(struct_ast, ast["header"]["name"]) for struct_ast in ast["structures"])
+    return "\n".join([header_content, structures_content])
 
 def build_wsgd(ast, proto_name):
     return pystache.render(WSDG_TEMPLATE,

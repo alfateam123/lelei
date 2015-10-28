@@ -78,8 +78,8 @@ def struct_byteorder(doc):
         #default value
         return "big_endian"
 
-def header_idfield(doc):
-    idfield_xml = doc.findall("header/id_field_name")
+def header_idfield(header_doc):
+    idfield_xml = header_doc.findall("id_field_name")
     assert len(idfield_xml) == 1, "the `header.id_field_name` is not defined in the source file."
     return idfield_xml[0].text  
 
@@ -101,28 +101,27 @@ def protocol_info(doc):
     return protocol_info
 
 
-def struct_info(doc, xpath_prefix="structure"):
+def struct_info(struct_doc):
     struct_ast = dict()
-    try:
-        struct_doc = doc.findall(xpath_prefix)[0]
-    except IndexError:
-        raise ValueError("could not find a structure there.")
-
     struct_ast["name"] = structure_name(struct_doc)
     struct_ast["fields"] = parse_fields(struct_doc)
     struct_ast["byte_order"] = struct_byteorder(struct_doc)
     return struct_ast
 
 def header_info(doc):
-    header_info = struct_info(doc, "header")
-    header_info["id_field_name"] = header_idfield(doc)
+    header_doc = doc.findall("header")[0]
+    header_info = struct_info(header_doc)
+    header_info["id_field_name"] = header_idfield(header_doc)
     return header_info
+
+def structures_info(doc):
+    return [struct_info(struct_doc) for struct_doc in doc.findall("structures/structure")]
 
 def build_ast(doc):
     ast = dict()
-    ast["proto"]  = protocol_info(doc)
-    ast["struct"] = struct_info(doc)
-    ast["header"] = header_info(doc)
+    ast["proto"]      = protocol_info(doc)
+    ast["header"]     = header_info(doc)
+    ast["structures"] = structures_info(doc)
     return ast
 
 def parse(str_):

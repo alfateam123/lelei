@@ -9,16 +9,19 @@ class TestStructParser(unittest.TestCase):
             self.xmlSource = test_data.read()
         self.parsed_doc = structureparser.parse(self.xmlSource)
 
+    def test_numberOfStructures(self):
+        self.assertEqual(len(self.parsed_doc["structures"]), 2)
+
     def test_nameIsCorrect(self):
-        self.assertEqual(self.parsed_doc["struct"]["name"], "stdUDPHeader")
+        self.assertEqual(self.parsed_doc["structures"][0]["name"], "stdUDPHeader")
 
     def test_numberOfFields(self):
-        self.assertEqual(len(self.parsed_doc["struct"]["fields"]), 5)
+        self.assertEqual(len(self.parsed_doc["structures"][0]["fields"]), 5)
 
     def test_isLastFieldOk(self):
-        self.assertEqual(self.parsed_doc["struct"]["fields"][-1]["type"], "uint32")
-        self.assertEqual(self.parsed_doc["struct"]["fields"][-1]["bits"], 32)
-        self.assertEqual(self.parsed_doc["struct"]["fields"][-1]["name"], "MessageChecksum")
+        self.assertEqual(self.parsed_doc["structures"][0]["fields"][-1]["type"], "uint32")
+        self.assertEqual(self.parsed_doc["structures"][0]["fields"][-1]["bits"], 32)
+        self.assertEqual(self.parsed_doc["structures"][0]["fields"][-1]["name"], "MessageChecksum")
 
     def test_struct_byteorder_default(self):
         parsed_doc = ET.fromstring("<structure></structure>")

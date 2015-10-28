@@ -38,12 +38,13 @@ Structure definition (still WIP)
 - header : same as `struct`. listing additional fields
   - id_field_name
 
-- struct
-  - name
-  - fields
-    - field
-      - repeated
-      - name
-      - type
-      - bits
-      - byte_order
+- structures
+  - struct
+    - name
+    - fields
+      - field
+        - repeated
+        - name
+        - type
+        - bits
+        - byte_order
