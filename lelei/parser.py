@@ -11,13 +11,13 @@ def bitsForStructure(struct_type, read_bits):
     except KeyError:
         raise ValueError("the given structure type {} does not exist".format(struct_type))
 
-def structure_name(doc, xpath_prefix="structure"):
-    names = doc.findall("{prefix}/name".format(prefix=xpath_prefix))
+def structure_name(doc):
+    names = doc.findall("name")
     assert len(names) == 1, len(names)
     return names[0].text
 
-def parse_fields(doc, xpath_prefix="structure"):
-    doc_fields = doc.findall("{prefix}/fields/field".format(prefix=xpath_prefix))
+def parse_fields(doc):
+    doc_fields = doc.findall("fields/field")
     assert len(doc_fields) > 0
     fields = [parse_field(f_) for f_ in doc_fields]
     return fields
@@ -68,7 +68,7 @@ def parse_field(field_doc):
     return field_ast
 
 def struct_byteorder(doc):
-    byteorder_xml = doc.findall("structure/byte_order")
+    byteorder_xml = doc.findall("byte_order")
     if len(byteorder_xml) >= 1:
         assert len(byteorder_xml) == 1, "`structure.byte_order` is defined too many times!"
         if byteorder_xml[0].text not in ["as_host", "big_endian", "little_endian"]:
@@ -103,9 +103,14 @@ def protocol_info(doc):
 
 def struct_info(doc, xpath_prefix="structure"):
     struct_ast = dict()
-    struct_ast["name"] = structure_name(doc, xpath_prefix)
-    struct_ast["fields"] = parse_fields(doc, xpath_prefix)
-    struct_ast["byte_order"] = struct_byteorder(doc)
+    try:
+        struct_doc = doc.findall(xpath_prefix)[0]
+    except IndexError:
+        raise ValueError("could not find a structure there.")
+
+    struct_ast["name"] = structure_name(struct_doc)
+    struct_ast["fields"] = parse_fields(struct_doc)
+    struct_ast["byte_order"] = struct_byteorder(struct_doc)
     return struct_ast
 
 def header_info(doc):

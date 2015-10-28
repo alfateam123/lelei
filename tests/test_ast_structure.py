@@ -21,23 +21,23 @@ class TestStructParser(unittest.TestCase):
         self.assertEqual(self.parsed_doc["struct"]["fields"][-1]["name"], "MessageChecksum")
 
     def test_struct_byteorder_default(self):
-        parsed_doc = ET.fromstring("<protocol><structure></structure></protocol>")
+        parsed_doc = ET.fromstring("<structure></structure>")
         self.assertEqual(structureparser.struct_byteorder(parsed_doc), "big_endian")
 
     def test_struct_byteorder_found_bigendian(self):
-        parsed_doc = ET.fromstring("<protocol><structure><byte_order>big_endian</byte_order></structure></protocol>")
+        parsed_doc = ET.fromstring("<structure><byte_order>big_endian</byte_order></structure>")
         self.assertEqual(structureparser.struct_byteorder(parsed_doc), "big_endian")
 
     def test_struct_byteorder_found_littleendian(self):
-        parsed_doc = ET.fromstring("<protocol><structure><byte_order>little_endian</byte_order></structure></protocol>")
+        parsed_doc = ET.fromstring("<structure><byte_order>little_endian</byte_order></structure>")
         self.assertEqual(structureparser.struct_byteorder(parsed_doc), "little_endian")
 
     def test_struct_byteorder_found_as_host(self):
-        parsed_doc = ET.fromstring("<protocol><structure><byte_order>as_host</byte_order></structure></protocol>")
+        parsed_doc = ET.fromstring("<structure><byte_order>as_host</byte_order></structure>")
         self.assertEqual(structureparser.struct_byteorder(parsed_doc), "as_host")
 
     def test_struct_byteorder_found_error(self):
-        parsed_doc = ET.fromstring("<protocol><structure><byte_order>error_endian</byte_order></structure></protocol>")
+        parsed_doc = ET.fromstring("<structure><byte_order>error_endian</byte_order></structure>")
         self.assertRaises(ValueError, lambda : structureparser.struct_byteorder(parsed_doc))
 
     def test_struct_field_repeated_default(self):
