@@ -41,8 +41,8 @@ class TestStructParser(unittest.TestCase):
         self.assertRaises(ValueError, lambda : structureparser.struct_byteorder(parsed_doc))
 
     def test_struct_field_repeated_default(self):
-        #no one has a `repeated` attribute, so it's ok for a "default :D"
-        self.assertEqual(self.parsed_doc["struct"]["fields"][0]["repeated"], 1)
+        xml_doc = ET.fromstring("""<field type="uint8">spare</field>""")
+        self.assertEqual(structureparser.struct_field_repeated(xml_doc), 1)
 
     def test_struct_field_repeated(self):
         xml_doc = ET.fromstring("""<field repeated="5" type="uint8">spare</field>""")
