@@ -38,15 +38,6 @@ Structure definition (still WIP)
 - header : same as `struct`. listing additional fields
   - id_field_name
 
-- struct
-  - name
-  - fields
-    - field
-      - name
-      - type
-      - bits
-      - byte_order
-
 - enums
   - enum
     - size [bits]
@@ -55,3 +46,15 @@ Structure definition (still WIP)
       - value
         - id [number, base-10 or base-16]
         - name
+
+- structures
+  - struct
+    - name
+    - struct_id
+    - fields
+      - field
+        - repeated
+        - name
+        - type
+        - bits
+        - byte_order

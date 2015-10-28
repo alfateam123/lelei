@@ -19,13 +19,13 @@ class TestASTChecker(unittest.TestCase):
         self.assertTrue(self.parsed_doc["proto"].get("proto_short", False))
 
     def test_ast_has_struct(self):
-        self.assertTrue(self.parsed_doc.get("struct", False))
-        self.assertTrue(self.parsed_doc["struct"].get("name", False))
+        self.assertTrue(self.parsed_doc.get("structures", False))
+        self.assertTrue(self.parsed_doc["structures"][0].get("name", False))
         #py3k removes dict.has_key. guido, come on...
         #the first version was self.parsed_doc["struct"].get("fields", False)
         #but... what if you have an empty structure? to be sure,
         # we just check that the "fields" key is present.
-        self.assertTrue("fields" in self.parsed_doc["struct"].keys())
+        self.assertTrue("fields" in self.parsed_doc["structures"][0].keys())
 
     def test_ast_has_header(self):
         self.assertTrue(self.parsed_doc.get("header", False))
@@ -43,37 +43,63 @@ class TestStructParser(unittest.TestCase):
             self.xmlSource = test_data.read()
         self.parsed_doc = structureparser.parse(self.xmlSource)
 
+    def test_numberOfStructures(self):
+        self.assertEqual(len(self.parsed_doc["structures"]), 2)
+
     def test_nameIsCorrect(self):
-        self.assertEqual(self.parsed_doc["struct"]["name"], "stdUDPHeader")
+        self.assertEqual(self.parsed_doc["structures"][0]["name"], "stdUDPHeader")
+
+    def test_struct_id_isCorrect(self):
+        self.assertEqual(self.parsed_doc["structures"][0]["struct_id"], 10100)
+        self.assertEqual(self.parsed_doc["structures"][1]["struct_id"], 10200)
 
     def test_numberOfFields(self):
-        self.assertEqual(len(self.parsed_doc["struct"]["fields"]), 5)
+        self.assertEqual(len(self.parsed_doc["structures"][0]["fields"]), 5)
 
     def test_isLastFieldOk(self):
-        self.assertEqual(self.parsed_doc["struct"]["fields"][-1]["type"], "uint32")
-        self.assertEqual(self.parsed_doc["struct"]["fields"][-1]["bits"], 32)
-        self.assertEqual(self.parsed_doc["struct"]["fields"][-1]["name"], "MessageChecksum")
+        self.assertEqual(self.parsed_doc["structures"][0]["fields"][-1]["type"], "uint32")
+        self.assertEqual(self.parsed_doc["structures"][0]["fields"][-1]["bits"], 32)
+        self.assertEqual(self.parsed_doc["structures"][0]["fields"][-1]["name"], "MessageChecksum")
 
     def test_struct_byteorder_default(self):
-        parsed_doc = ET.fromstring("<protocol><structure></structure></protocol>")
+        parsed_doc = ET.fromstring("<structure></structure>")
         self.assertEqual(structureparser.struct_byteorder(parsed_doc), "big_endian")
 
     def test_struct_byteorder_found_bigendian(self):
-        parsed_doc = ET.fromstring("<protocol><structure><byte_order>big_endian</byte_order></structure></protocol>")
+        parsed_doc = ET.fromstring("<structure><byte_order>big_endian</byte_order></structure>")
         self.assertEqual(structureparser.struct_byteorder(parsed_doc), "big_endian")
 
     def test_struct_byteorder_found_littleendian(self):
-        parsed_doc = ET.fromstring("<protocol><structure><byte_order>little_endian</byte_order></structure></protocol>")
+        parsed_doc = ET.fromstring("<structure><byte_order>little_endian</byte_order></structure>")
         self.assertEqual(structureparser.struct_byteorder(parsed_doc), "little_endian")
 
     def test_struct_byteorder_found_as_host(self):
-        parsed_doc = ET.fromstring("<protocol><structure><byte_order>as_host</byte_order></structure></protocol>")
+        parsed_doc = ET.fromstring("<structure><byte_order>as_host</byte_order></structure>")
         self.assertEqual(structureparser.struct_byteorder(parsed_doc), "as_host")
 
     def test_struct_byteorder_found_error(self):
-        parsed_doc = ET.fromstring("<protocol><structure><byte_order>error_endian</byte_order></structure></protocol>")
+        parsed_doc = ET.fromstring("<structure><byte_order>error_endian</byte_order></structure>")
         self.assertRaises(ValueError, lambda : structureparser.struct_byteorder(parsed_doc))
 
+    def test_struct_field_repeated_default(self):
+        xml_doc = ET.fromstring("""<field type="uint8">spare</field>""")
+        self.assertEqual(structureparser.struct_field_repeated(xml_doc), 1)
+
+    def test_struct_field_repeated(self):
+        xml_doc = ET.fromstring("""<field repeated="5" type="uint8">spare</field>""")
+        self.assertEqual(structureparser.struct_field_repeated(xml_doc), 5)
+
+    def test_struct_field_repeated_zero(self):
+        xml_doc = ET.fromstring("""<field repeated="0" type="uint8">spare</field>""")
+        self.assertRaises(ValueError, lambda : structureparser.struct_field_repeated(xml_doc))
+
+    def test_struct_field_repeated_negative(self):
+        xml_doc = ET.fromstring("""<field repeated="-15" type="uint8">spare</field>""")
+        self.assertRaises(ValueError, lambda : structureparser.struct_field_repeated(xml_doc))
+
+    def test_struct_field_repeated_useavariable(self):
+        xml_doc = ET.fromstring("""<field repeated="number_of_numbers" type="uint8">spare</field>""")
+        self.assertEqual(structureparser.struct_field_repeated(xml_doc), "number_of_numbers")
 
 class TestProtocolInfo(unittest.TestCase):
 

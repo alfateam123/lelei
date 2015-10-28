@@ -18,11 +18,26 @@ class TestFieldBuilder(unittest.TestCase):
         res = ws.build_field(parsed_doc)
         self.assertEqual("uint8 test;", res)
 
-    @unittest.skip("no_statement has not been implemented yet, left for later")
-    def test_int8_nostmt(self):
-        parsed_doc = parser.parse_field(ET.fromstring('<field type="uint8"  bits="0" nostmt="2">test</field>'))
+    def test_int8_repeated_onetime(self):
+        parsed_doc = parser.parse_field(ET.fromstring('<field type="uint8" repeated="1">test</field>'))
         res = ws.build_field(parsed_doc)
-        self.assertEqual("uint8{ns=0} test;", res)
+        self.assertEqual("uint8 test;", res)
+
+    def test_int8_repeated(self):
+        parsed_doc = parser.parse_field(ET.fromstring('<field type="uint8" repeated="5">test</field>'))
+        res = ws.build_field(parsed_doc)
+        self.assertEqual("uint8[5] test;", res)
+
+    def test_int8_repeated_variable(self):
+        parsed_doc = parser.parse_field(ET.fromstring('<field type="uint8" repeated="num_of_nums">test</field>'))
+        res = ws.build_field(parsed_doc)
+        self.assertEqual("uint8[num_of_nums] test;", res)
+
+    # @unittest.skip("no_statement has not been implemented yet, left for later")
+    # def test_int8_nostmt(self):
+    #     parsed_doc = parser.parse_field(ET.fromstring('<field type="uint8"  bits="0" nostmt="2">test</field>'))
+    #     res = ws.build_field(parsed_doc)
+    #     self.assertEqual("uint8{ns=0} test;", res)
 
 class TestStructBuilder(unittest.TestCase):
 
@@ -35,7 +50,7 @@ class TestStructBuilder(unittest.TestCase):
 
     def test_onefield_struct(self):
         parsed_doc = parser.parse(self.xmlOneFieldSource)
-        res = ws.build_struct(parsed_doc["struct"], parsed_doc["header"]["name"])
+        res = ws.build_struct(parsed_doc["structures"][0], parsed_doc["header"]["name"])
         self.assertEqual(res, norm_multiline_str("""
             struct stdUDPHeader
             {
@@ -47,7 +62,7 @@ class TestStructBuilder(unittest.TestCase):
 
     def test_multiplefields_struct(self):
         parsed_doc = parser.parse(self.xmlSource)
-        res = ws.build_struct(parsed_doc["struct"], parsed_doc["header"]["name"])
+        res = ws.build_struct(parsed_doc["structures"][0], parsed_doc["header"]["name"])
         self.assertEqual(res, norm_multiline_str("""
             struct stdUDPHeader
             {

@@ -8,10 +8,13 @@
 		</fields>
 		<id_field_name>PacketID</id_field_name>
 	</header>
-	<structure>
-		<name>stdUDPHeader</name>
-		<fields>
-			<field type="uint16" bits="0">MessageID</field>
-		</fields>
-	</structure>
+	<structures>
+		<structure>
+			<struct_id>30300</struct_id>
+			<name>stdUDPHeader</name>
+			<fields>
+				<field type="uint16" bits="0">MessageID</field>
+			</fields>
+		</structure>
+	</structures>
 </protocol>

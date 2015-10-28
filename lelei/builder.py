@@ -38,13 +38,23 @@ PROTO_TYPE_DEFINITIONS
 include {{fname}}.fdesc ;
 """.strip()
 
+FIELD_TMPL = "{{type}} {{name}};"
+
+def build_simple_field(type_, name_):
+    return pystache.render(FIELD_TMPL, type=type_, name=name_)
+
 def build_field(field_ast):
-    return pystache.render("{{type}} {{name}};", field_ast)
+    type_ = field_ast["type"]
+    try:
+        type_ += "[{0}]".format(field_ast["repeated"]) if field_ast["repeated"]>1 else ""
+    except TypeError: #comparing strings and ints
+        type_ += "[{0}]".format(field_ast["repeated"])
+    return pystache.render("{{type}} {{name}};", field_ast, type=type_)
 
 def build_struct(struct_ast, header_type_name=None):
     fields = (build_field(f_) for f_ in struct_ast["fields"])
-    header_field = build_field({"type":header_type_name, "name":"header"}) if header_type_name else ""
-    byteorder_field = build_field({"type":"byte_order", "name":struct_ast["byte_order"]})
+    header_field    = build_simple_field(header_type_name, "header") if header_type_name else ""
+    byteorder_field = build_simple_field("byte_order", struct_ast["byte_order"])
     return pystache.render(STRUCT_TEMPLATE,
                            header_field=header_field,
                            struct_name=struct_ast["name"],
@@ -57,10 +67,11 @@ def build_enum(enum_ast):
     return pystache.render(ENUM_TEMPLATE, ast=enum_ast, values=values)
 
 def build_fdesc(ast):
-    header_content = build_struct(ast["header"])
-    struct_content = build_struct(ast["struct"], ast["header"]["name"])
-    enums_content  = "\n".join(build_enum(enum_ast) for enum_ast in ast["enums"])
-    return "\n".join([enums_content, header_content, struct_content])
+    header_content     = build_struct(ast["header"])
+    enums_content      = "\n".join(build_enum(enum_ast) for enum_ast in ast["enums"])
+    structures_content = "\n".join(build_struct(struct_ast, ast["header"]["name"]) for struct_ast in ast["structures"])
+    return "\n".join([enums_content, header_content,structures_content])
+
 
 def build_wsgd(ast, proto_name):
     return pystache.render(WSDG_TEMPLATE,

@@ -11,41 +11,69 @@ def bitsForStructure(struct_type, read_bits):
     except KeyError:
         raise ValueError("the given structure type {} does not exist".format(struct_type))
 
-def structure_name(doc, xpath_prefix="structure"):
-    names = doc.findall("{prefix}/name".format(prefix=xpath_prefix))
+def structure_name(doc):
+    names = doc.findall("name")
     assert len(names) == 1, len(names)
     return names[0].text
 
-def parse_fields(doc, xpath_prefix="structure"):
-    doc_fields = doc.findall("{prefix}/fields/field".format(prefix=xpath_prefix))
+def structure_id(doc):
+    ids = doc.findall("struct_id")
+    assert len(ids) == 1, len(ids)
+    return int(ids[0].text)
+
+def parse_fields(doc):
+    doc_fields = doc.findall("fields/field")
     assert len(doc_fields) > 0
     fields = [parse_field(f_) for f_ in doc_fields]
     return fields
+
+def struct_field_lenght(field_doc, field_ast):
+    lenght_ast = dict()
+    #some fields (e.g. float32) have a fixed size, so it's useless
+    # to set `bits=0` while defining such fields.
+    try:
+        #obviously, the KeyError is related to `bits` and not to `type`.
+        lenght_ast["bits"] = bitsForStructure(field_doc.attrib["type"], int(field_doc.attrib["bits"]))
+    except KeyError:
+        try:
+            lenght_ast["bits"] = bitsForStructure(field_doc.attrib["type"], 8*int(field_doc.attrib["lenght"]))
+        except KeyError:
+            try:
+                lenght_ast["bits"] = bitsForStructure(field_doc.attrib["type"], 0)
+            except ValueError as ve:
+                if field_ast["type"] == "raw(*)":
+                    lenght_ast["bits"] = 8
+                else:
+                    raise ve
+    return lenght_ast
+
+def struct_field_repeated(field_doc):
+    #try to read it from the attributes. if it's not there, return a default
+    try:
+        rep_value = field_doc.attrib["repeated"]
+    except KeyError:
+        return 1
+
+    #try to check if it's an integer. if it's not, return it
+    try:
+        rep_value = int(rep_value)
+    except ValueError:
+        return rep_value
+
+    if rep_value <= 0:
+        raise ValueError("the given `field.repeated` value ({0}) is not a natural number!".format(rep_value))
+    return rep_value
 
 def parse_field(field_doc):
     field_ast = dict()
     field_ast["name"] = field_doc.text
     field_ast["type"] = field_doc.attrib["type"]
-    #some fields (e.g. float32) have a fixed size, so it's useless
-    # to set `bits=0` while defining such fields.
-    try:
-        #obviously, the KeyError is related to `bits` and not to `type`.
-        field_ast["bits"] = bitsForStructure(field_doc.attrib["type"], int(field_doc.attrib["bits"]))
-    except KeyError:
-        try:
-            field_ast["bits"] = bitsForStructure(field_doc.attrib["type"], 8*int(field_doc.attrib["lenght"]))
-        except KeyError:
-            try:
-                field_ast["bits"] = bitsForStructure(field_doc.attrib["type"], 0)
-            except ValueError as ve:
-                if field_ast["type"] == "raw(*)":
-                    field_ast["bits"] = 8
-                else:
-                    raise ve
+    field_ast["bits"] = struct_field_lenght(field_doc, field_ast)["bits"]
+    field_ast["repeated"] = struct_field_repeated(field_doc)
     return field_ast
 
 def struct_byteorder(doc):
-    byteorder_xml = doc.findall("structure/byte_order")
+    byteorder_xml = doc.findall("byte_order")
     if len(byteorder_xml) >= 1:
         assert len(byteorder_xml) == 1, "`structure.byte_order` is defined too many times!"
         if byteorder_xml[0].text not in ["as_host", "big_endian", "little_endian"]:
@@ -55,8 +83,8 @@ def struct_byteorder(doc):
         #default value
         return "big_endian"
 
-def header_idfield(doc):
-    idfield_xml = doc.findall("header/id_field_name")
+def header_idfield(header_doc):
+    idfield_xml = header_doc.findall("id_field_name")
     assert len(idfield_xml) == 1, "the `header.id_field_name` is not defined in the source file."
     return idfield_xml[0].text  
 
@@ -109,27 +137,35 @@ def protocol_info(doc):
 
     return protocol_info
 
-def struct_info(doc, xpath_prefix="structure"):
+def struct_info(struct_doc):
     struct_ast = dict()
-    struct_ast["name"] = structure_name(doc, xpath_prefix)
-    struct_ast["fields"] = parse_fields(doc, xpath_prefix)
-    struct_ast["byte_order"] = struct_byteorder(doc)
+    struct_ast["name"]       = structure_name(struct_doc)
+    struct_ast["fields"]     = parse_fields(struct_doc)
+    try:
+        struct_ast["struct_id"]  = structure_id(struct_doc)
+    except AssertionError: #we got an header. silly us.
+        struct_ast["struct_id"]  = None
+    struct_ast["byte_order"] = struct_byteorder(struct_doc)
     return struct_ast
 
 def header_info(doc):
-    header_info = struct_info(doc, "header")
-    header_info["id_field_name"] = header_idfield(doc)
+    header_doc = doc.findall("header")[0]
+    header_info = struct_info(header_doc)
+    header_info["id_field_name"] = header_idfield(header_doc)
     return header_info
+
+def structures_info(doc):
+    return [struct_info(struct_doc) for struct_doc in doc.findall("structures/structure")]
 
 def global_enums(doc):
     return [parse_enum(enum_doc) for enum_doc in doc.findall("enums/enum")]
 
 def build_ast(doc):
     ast = dict()
-    ast["proto"]  = protocol_info(doc)
-    ast["struct"] = struct_info(doc)
-    ast["header"] = header_info(doc)
-    ast["enums"]  = global_enums(doc)
+    ast["proto"]      = protocol_info(doc)
+    ast["enums"]      = global_enums(doc)
+    ast["header"]     = header_info(doc)
+    ast["structures"] = structures_info(doc)
     return ast
 
 def parse(str_):
