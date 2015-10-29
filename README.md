@@ -52,14 +52,14 @@ This is a list of the thing that will be implemented
 
 - [x] Struct
 - [x] Local byte order spec
-- [ ] Enum
-- [ ] Transform spec
+- [x] Enum
 - [x] Arrays
-- [ ] Multiple structures support
+- [x] Multiple structures support
 
-This is a list of things that will be implemented,
-but not in the nearest future.
+This is a list of things that will be implemented soon. The important things are now available,
+but some additional testing to the whole system is needed.
 
+- [ ] Transform spec
 - [ ] Display spec
 - [ ] Constraint spec
 - [ ] No Statement value
