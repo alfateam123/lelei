@@ -92,7 +92,7 @@ SIZE_CHECKERS["int40"] = intChecker(40)
 SIZE_CHECKERS["int48"] = intChecker(48)
 SIZE_CHECKERS["uint40"] = intChecker(40)
 SIZE_CHECKERS["uint48"] = intChecker(48)
-SIZE_CHECKERS["uint64"] = intChecker(64)
+SIZE_CHECKERS["int64"] = intChecker(64)
 
 for i in [1, 8, 16, 32]:
     SIZE_CHECKERS["bool%i"%i] = boolChecker(i)

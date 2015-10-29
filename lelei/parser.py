@@ -11,13 +11,18 @@ def bitsForStructure(struct_type, read_bits):
     except KeyError:
         raise ValueError("the given structure type {} does not exist".format(struct_type))
 
-def structure_name(doc, xpath_prefix="structure"):
-    names = doc.findall("{prefix}/name".format(prefix=xpath_prefix))
+def structure_name(doc):
+    names = doc.findall("name")
     assert len(names) == 1, len(names)
     return names[0].text
 
-def parse_fields(doc, xpath_prefix="structure"):
-    doc_fields = doc.findall("{prefix}/fields/field".format(prefix=xpath_prefix))
+def structure_id(doc):
+    ids = doc.findall("struct_id")
+    assert len(ids) == 1, len(ids)
+    return int(ids[0].text)
+
+def parse_fields(doc):
+    doc_fields = doc.findall("fields/field")
     assert len(doc_fields) > 0
     fields = [parse_field(f_) for f_ in doc_fields]
     return fields
@@ -68,7 +73,7 @@ def parse_field(field_doc):
     return field_ast
 
 def struct_byteorder(doc):
-    byteorder_xml = doc.findall("structure/byte_order")
+    byteorder_xml = doc.findall("byte_order")
     if len(byteorder_xml) >= 1:
         assert len(byteorder_xml) == 1, "`structure.byte_order` is defined too many times!"
         if byteorder_xml[0].text not in ["as_host", "big_endian", "little_endian"]:
@@ -78,10 +83,42 @@ def struct_byteorder(doc):
         #default value
         return "big_endian"
 
-def header_idfield(doc):
-    idfield_xml = doc.findall("header/id_field_name")
+def header_idfield(header_doc):
+    idfield_xml = header_doc.findall("id_field_name")
     assert len(idfield_xml) == 1, "the `header.id_field_name` is not defined in the source file."
     return idfield_xml[0].text  
+
+def parse_enum_pair(enum_keyvalue_doc):
+    ast = {"name": enum_keyvalue_doc.text, "id":None}
+
+    #IDs have to be decimal or hexadecimal.
+    try:
+        ast["id"] = int(enum_keyvalue_doc.attrib["id"])
+    except ValueError:
+        try:
+            ast["id"] = int(enum_keyvalue_doc.attrib["id"], 16)
+        except ValueError:
+            raise ValueError("the given ID for value {0} is"
+                             " not decimal or hexadecimal: {1}".format(ast["name"],
+                                enum_keyvalue_doc.attrib["id"]))
+    return ast
+
+def parse_enum(enum_doc):
+    enum_ast = {
+        "values":[],
+        "name": enum_doc.findall("name")[0].text
+    }
+
+    try:
+        enum_ast["size"] = int(enum_doc.findall("size")[0].text)
+        assert 1 <= enum_ast["size"] <= 32
+    except IndexError:
+        enum_ast["size"] = 32
+
+    for value_doc in enum_doc.findall("values/value"):
+        enum_ast["values"].append(parse_enum_pair(value_doc))
+
+    return enum_ast
 
 def protocol_info(doc):
     protocol_info = {"proto_name": None, "proto_short": None}
@@ -100,24 +137,35 @@ def protocol_info(doc):
 
     return protocol_info
 
-
-def struct_info(doc, xpath_prefix="structure"):
+def struct_info(struct_doc):
     struct_ast = dict()
-    struct_ast["name"] = structure_name(doc, xpath_prefix)
-    struct_ast["fields"] = parse_fields(doc, xpath_prefix)
-    struct_ast["byte_order"] = struct_byteorder(doc)
+    struct_ast["name"]       = structure_name(struct_doc)
+    struct_ast["fields"]     = parse_fields(struct_doc)
+    try:
+        struct_ast["struct_id"]  = structure_id(struct_doc)
+    except AssertionError: #we got an header. silly us.
+        struct_ast["struct_id"]  = None
+    struct_ast["byte_order"] = struct_byteorder(struct_doc)
     return struct_ast
 
 def header_info(doc):
-    header_info = struct_info(doc, "header")
-    header_info["id_field_name"] = header_idfield(doc)
+    header_doc = doc.findall("header")[0]
+    header_info = struct_info(header_doc)
+    header_info["id_field_name"] = header_idfield(header_doc)
     return header_info
+
+def structures_info(doc):
+    return [struct_info(struct_doc) for struct_doc in doc.findall("structures/structure")]
+
+def global_enums(doc):
+    return [parse_enum(enum_doc) for enum_doc in doc.findall("enums/enum")]
 
 def build_ast(doc):
     ast = dict()
-    ast["proto"]  = protocol_info(doc)
-    ast["struct"] = struct_info(doc)
-    ast["header"] = header_info(doc)
+    ast["proto"]      = protocol_info(doc)
+    ast["enums"]      = global_enums(doc)
+    ast["header"]     = header_info(doc)
+    ast["structures"] = structures_info(doc)
     return ast
 
 def parse(str_):

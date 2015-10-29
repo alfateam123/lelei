@@ -39,5 +39,7 @@ nosetests.xml
 .lelei/
 .eggs/
 *.xml
+*.fdesc
+*.wsgd
 dissectors/
 .ropeproject/
