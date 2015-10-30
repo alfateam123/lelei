@@ -71,7 +71,7 @@ class TestStructBuilder(unittest.TestCase):
                 uint16 MessageID;
                 uint16 MessageLenght;
                 uint32 MessageCount;
-                uint64 MessageSendTime;
+                int64 MessageSendTime;
                 uint32 MessageChecksum;
             }
             """) )

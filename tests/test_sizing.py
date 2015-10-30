@@ -2,7 +2,7 @@ import unittest
 from lelei import parser as sp
 
 class TestStructureAutoSizing(unittest.TestCase):
-    
+
     def test_bitsAreCalculatedCorrectly(self):
         self.assertEqual(sp.bitsForStructure("uint8",  3),  3)
         self.assertEqual(sp.bitsForStructure("uint8",  8),  8)
@@ -12,7 +12,7 @@ class TestStructureAutoSizing(unittest.TestCase):
             self.assertEqual(sp.bitsForStructure("uint%d"%i, 0), i)
         self.assertEqual(sp.bitsForStructure("uint40", 0), 40)
         self.assertEqual(sp.bitsForStructure("uint48", 0), 48)
-        self.assertEqual(sp.bitsForStructure("uint64", 0), 64)
+        self.assertRaises(ValueError, lambda : sp.bitsForStructure("uint64", 0))
 
     def test_int(self):
         self.assertRaises(ValueError, lambda : sp.bitsForStructure("int1", 0))

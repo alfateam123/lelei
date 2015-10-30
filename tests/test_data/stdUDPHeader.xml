@@ -16,7 +16,7 @@
         <field type="uint16" bits="0">MessageID</field>
         <field type="uint16" bits="0">MessageLenght</field>
         <field type="uint32" bits="0">MessageCount</field>
-        <field type="uint64" bits="0">MessageSendTime</field>
+        <field type="int64" bits="0">MessageSendTime</field>
         <field type="uint32" bits="0">MessageChecksum</field>
       </fields>
     </structure>
