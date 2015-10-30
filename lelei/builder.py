@@ -50,10 +50,13 @@ switch T_msg_switch T_type_messages
 }
 """
 
-SWITCH_CASE_TMPL = "case T_type_messages::{{id}} : {{struct_name}};"
+SWITCH_CASE_TMPL = "case T_type_messages::{{struct_name}}_t : {{struct_name}} \"\";"
 
 def build_simple_field(type_, name_):
     return pystache.render(FIELD_TMPL, type=type_, name=name_)
+
+def build_simple_enum(type_, name_):
+    return pystache.render("{{type}} {{name}}", type=type_, name=name_)
 
 def build_field(field_ast):
     type_ = field_ast["type"]
@@ -75,15 +78,16 @@ def build_struct(struct_ast, header_type_name=None):
 
 def build_enum(enum_ast):
     #one day, I'll understand how to do the same thing using mustache only.
-    values = [build_simple_field(type_=value_ast["name"], name_=value_ast["id"]) for value_ast in enum_ast["values"]]
+    values = [build_simple_enum(type_=value_ast["name"], name_=value_ast["id"]) for value_ast in enum_ast["values"]]
     return pystache.render(ENUM_TEMPLATE, ast=enum_ast, values=values)
 
 def build_type_messages(ast):
     id_field_name = ast["header"]["id_field_name"]
     #incidentally, an IndexError will be raised here.
     #It should be done during the parsing phase, but nobody is perfect :)
-    id_field_type = filter(lambda field: field["name"]==id_field_name, ast["header"]["fields"])[0]["type"]
-    ids_list = [build_simple_field(type_=struct_ast["name"], name_=struct_ast["struct_id"])
+    id_field_type = [f_ for f_ in ast["header"]["fields"]
+                     if f_["name"] == id_field_name ][0]["type"]
+    ids_list = [build_simple_enum(type_=struct_ast["name"]+"_t", name_=struct_ast["struct_id"])
                   for struct_ast in ast["structures"]]
     return pystache.render(ENUM_TEMPLATE, ast={
                                           "size": re.findall("(\d+)$", id_field_type)[0],
@@ -95,12 +99,13 @@ def build_type_switch(ast):
     id_field_name = ast["header"]["id_field_name"]
     #incidentally, an IndexError will be raised here.
     #It should be done during the parsing phase, but nobody is perfect :)
-    id_field_type = filter(lambda field: field["name"]==id_field_name, ast["header"]["fields"])[0]["type"]
+    id_field_type = [field for field in ast["header"]["fields"]
+                     if field["name"]==id_field_name][0]["type"]
     ids_list = [(struct_ast["name"], struct_ast["struct_id"])
                   for struct_ast in ast["structures"]]
     return pystache.render(SWITCH_TMPL,
-      values = [pystache.render(SWITCH_CASE_TMPL, id=id_[1], struct_name=id_[0])
-                  for id_ in ids_list])
+      values = [pystache.render(SWITCH_CASE_TMPL,struct_name=id_[0])
+                  for id_ in ids_list]).replace("&quot;", '"')
 
 
 def build_fdesc(ast):
