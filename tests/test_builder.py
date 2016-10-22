@@ -39,6 +39,21 @@ class TestFieldBuilder(unittest.TestCase):
     #     res = ws.build_field(parsed_doc)
     #     self.assertEqual("uint8{ns=0} test;", res)
 
+    def test_spare_size_ignored_bits(self):
+        parsed_doc = parser.parse_field(ET.fromstring('<field type="spare" bits="10">test</field>'))
+        res = ws.build_field(parsed_doc)
+        self.assertEqual("spare test;", res)
+
+    def test_spare_size_ignored_lenght(self):
+        parsed_doc = parser.parse_field(ET.fromstring('<field type="spare" lenght="10">test</field>'))
+        res = ws.build_field(parsed_doc)
+        self.assertEqual("spare test;", res)
+
+    def test_spare_nosize(self):
+        parsed_doc = parser.parse_field(ET.fromstring('<field type="spare">test</field>'))
+        res = ws.build_field(parsed_doc)
+        self.assertEqual("spare test;", res)
+
 class TestStructBuilder(unittest.TestCase):
 
     def setUp(self):

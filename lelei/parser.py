@@ -43,6 +43,8 @@ def struct_field_lenght(field_doc, field_ast):
             except ValueError as ve:
                 if field_ast["type"] == "raw(*)":
                     lenght_ast["bits"] = 8
+                elif field_ast["type"] == "spare":
+                    lenght_ast["bits"] = 8
                 else:
                     raise ve
     return lenght_ast
