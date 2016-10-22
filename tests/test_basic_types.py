@@ -23,6 +23,10 @@ class TestSpareType(unittest.TestCase):
         spare_desc = ET.fromstring('<field type="spare" bits="a">woot</field>')
         self.assertRaises(ValueError, lambda : structureparser.parse_field(spare_desc))
 
+    def test_spare_nosize(self):
+        spare_desc = ET.fromstring('<field type="spare"></field>')
+        result = structureparser.parse_field(spare_desc)
+
 class TestFloat(unittest.TestCase):
     
     def test_float32(self):
