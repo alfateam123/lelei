@@ -4,13 +4,10 @@ Lelei: XML -> WireShark Generic Dissector
 ### Disclaimer ###
 [![Build Status](https://travis-ci.org/alfateam123/lelei.svg?branch=master)](https://travis-ci.org/alfateam123/lelei)
 
-PLEASE NOTE THAT THIS PROJECT IS NOT FULLY FUNCTIONAL, SO USE IT AT YOUR OWN RISK. CONSIDER IT TO BE INCOMPLET AND INKORRECT. YOU HAVE BEEN WARNED.
-
 ### What is that? ###
 
 Lelei is a [cute sorceress](http://gate-thus-the-jsdf-fought-there.wikia.com/wiki/Lelei_La_Lalena)... no, wait, nevermind.
-Lelei is an automatic WireShark Generic Dissector that, starting from an XML description,
-generates the `.fdesc` and `.wsgd` files you need to perform network analysis.
+Lelei is a [WireShark Generic Dissector](http://wsgd.free.fr/) generator: starting from an XML description of the structure you want to capture in Wireshark, it generates the `.fdesc` and `.wsgd` files you need to perform network analysis.
 
 Please note that Lelei is not a validating generator: it means it may generate generic
 dissectors that violate the WSGD grammar or context (using basic types incorrectly, 
@@ -19,9 +16,9 @@ please open an issue and we'll help you sorting it out.
 
 ### How to use ###
 
-1. Define your packet structure in XML
-2. `lelei rory.xml rory`
-3. Copy the resulting `rory.fdesc` and `rory.wsgd` to your Wireshark folders
+1. Define your packet structure in XML (see the _test_data_ folder for some examples)
+2. Generate the generic dissectors: `lelei <packet_structure.xml> <output>`
+3. Copy the resulting `output.fdesc` and `output.wsgd` to your Wireshark folders
 4. Open Wireshark and analyze your net traffic!
 
 ### Yet another generator, I see... ###
@@ -32,11 +29,6 @@ If you're interested in alternatives, you may use [Csjark](https://csjark.readth
 which translates C structures to Lua-based dissectors.
 
 ### Important things: state of work ###
-
-Does it write things yet? **Yes**.
-
-How much of the grammar has been implemented?  
-This is a list of the thing that will be implemented
 
 - Basic Types
   - [x] spare
@@ -56,14 +48,7 @@ This is a list of the thing that will be implemented
 - [x] Arrays
 - [x] Multiple structures support
 
-This is a list of things that will be implemented soon. The important things are now available,
-but some additional testing to the whole system is needed.
-
-- [ ] Transform spec
-- [ ] Display spec
-- [ ] Constraint spec
-- [ ] No Statement value
-
-The rest of the specification may come even later, if it's ever implemented.
-If you really need it _now_, please feel free to contribute with a Pull Request
-via Github.
+I don't need this project at my day job anymore, so the rest of the
+specification is probably not going to be implemented.
+If you need something that is not implemented yet, please feel free to contribute
+with a Pull Request via Github, or [contact me](https://wintermade.it).
